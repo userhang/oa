@@ -1,0 +1,27 @@
+<%- include header %>
+<p>
+<% if (user && (user.iid == post.iid)) {%>
+
+<span><a class="edit" href="/edit/<%= post.iid %>/<%= post.time.day %>/<%=post.title %>">编辑</a></span>
+<span><a class="edit" href="/remove/<%= post.iid %>/<%= post.time.day %>/<%=post.title %>">删除</a></span>
+<% } %>
+</p>
+<p calss="info">
+    账号：<a href="/u/<%= post.iid %>"><%= post.iid %></a>
+    作者：<a href="/u/<%= post.iid %>"><%= post.name %></a>
+    日期：<%= post.time.minute %>
+    标签：
+    <% post.tags.forEach(function(tag,index){ %>
+    <% if (tag) { %>
+    <a class="tag" href="/tags/<%= tag %>"><%=tag %></a>
+    <% } %>
+    <% }) %>
+</p>
+<p><%- post.post %></p>
+<p class="info">阅读：<%=post.pv %>  |   评论: <%= post.comments.length %></p>
+<%- include postfiles %>
+<%- include comment %>
+<%- include footer %>
+
+
+

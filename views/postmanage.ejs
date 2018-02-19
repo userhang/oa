@@ -1,0 +1,40 @@
+<%- include header %>
+<% if (department=='销售部') { %>
+<div style="float:left;width:100%">
+<form action="/searchpost" method="post">
+<input type="text" name="id" placeholder="账号" class="search">
+<input type="text" name="name" placeholder="姓名" class="search">
+<input type="text" name="department" placeholder="部门" class="search">
+<input type="text" name="title" placeholder="标题" class="search" style="width:40%">
+<input type="submit" value="查询" />
+</form>
+</div>
+<hr>
+<br/>
+<% }else { %>
+<div style="float:left;width:100%">
+<form action="/searchpost" method="post">
+<input type="text" name="id" placeholder="账号" class="search">
+<input type="text" name="name" placeholder="姓名" class="search">
+<input type="text" name="title" placeholder="标题" class="search" style="width:40%">
+
+<input type="submit" value="查询" />
+</form>
+</div>
+<hr>
+<br/>
+<% } %>
+
+<ul class="archive">
+<% var lastYear =0 %>
+<% posts.forEach(function (post,index){ %>
+<% if(lastYear !=post.time.year){%>
+	<li><h3><%=post.time.year %></h3></li>
+	<% lastYear=post.time.year } %>
+	<li><time><%= post.time.day %></time></li>
+	<li><a href="/u/<%= post.iid %>/<%= post.time.day %>/<%=post.title %>"><%= post.title %></a></li>
+	<span><a class="edit" href="/remove/<%= post.iid %>/<%= post.time.day %>/<%=post.title %>">删除</a></span>
+<% }) %>
+</ul>	
+<%- include paging %>
+<%- include footer %>

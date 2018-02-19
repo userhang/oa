@@ -1,0 +1,22 @@
+<%- include header %>
+<form method="post">
+新增部门：<input type="text" name="name" /><br/>
+
+<input type="submit" value="注册" />
+</form>
+<br>
+<hr>
+<% departments.forEach(function(department,index){%>
+	<form action="/changedepartment" method="post">
+    	<input type="text" name="id"  readonly  unselectable="on"  class="<%= user._id %>" value="<%= department.iid %>">
+        <input type="text" name="name" value="<%= department.name %>" />
+          <input type="text" name="day" value="<%= department.time.day %>" />
+        <input type="submit" value="修改" style="margin-right: 5em;" />
+    </form>
+    <a href="/deletedepartment/<%=department.iid %>" class="dele" />删除</a>
+<br>
+<% }) %>
+
+
+<%- include paging %>
+<%- include footer %>

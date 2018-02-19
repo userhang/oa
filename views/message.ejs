@@ -1,0 +1,35 @@
+<%- include header %>
+<form method="post">
+账号名：<input type="text" name="reid" /><br/>
+消息：<input type="text" name="message" /><br/>
+<input type="submit" value="发送" />
+</form>
+<br>
+<hr>
+<% messages.forEach(function(message,index){%>
+
+<% if (message.sign=='no') { %>
+      时间：<%=message.time.minute %>
+	<form action="/viewmessage" method="post">
+        <input type="text" name="seid" value="<%=message.seid %>" />
+        <input type="submit" value="查看" style="margin-right: 5em;" /><span style="color:red;">*</span>
+    </form>
+    <a href="/deletefile/<%=message.seid %>/<%=message.seid %>" class="dele" />删除</a>
+     <br/>
+    <% } else { %>
+      
+    时间：<%=message.time.minute %>
+	<form action="/viewmessage" method="post">
+        <input type="text" name="seid" value="<%=message.seid %>" />
+        <input type="submit" value="查看" style="margin-right: 5em;" />
+    </form>
+    <a href="/deletefile/<%=message.seid %>/<%=message.seid %>" class="dele" />删除</a>
+<br>
+    <% } %>
+
+  
+<% }) %>
+
+
+<%- include paging %>
+<%- include footer %>

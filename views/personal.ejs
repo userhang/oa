@@ -1,0 +1,23 @@
+<%- include header %>
+
+
+
+	<form action="/prechange" method="post">
+    	<input type="text" name="id"  readonly  unselectable="on" style="background-color:#D1D1D1;" class="<%= user._id %>" value="<%= user.iid %>">
+        <input type="text" name="name" value="<%= user.name %>" />
+        <input type="text" name="email" value="<%= user.email %>" />
+        <input type="text" name="age" value="<%= user.age %>" />
+        <input type="text" name="department"  readonly  unselectable="on" style="background-color:#D1D1D1;" value="<%= user.idepartment %>" />
+        <input type="text" name="day" readonly  unselectable="on" style="background-color:#D1D1D1;" value="<%= user.idate.day %>" />
+        <input type="text" name="place" value="<%= user.place %>" />
+        <input type="text" name="role"   readonly  unselectable="on" style="background-color:#D1D1D1;" value="<%= user.irole %>" />
+         <input type="password" name="password" value="<%= user.password %>" />
+        <input type="submit" value="修改" style="margin-right: 5em;" />
+    </form>
+   
+<br>
+
+
+
+
+<%- include footer %>

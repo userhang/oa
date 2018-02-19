@@ -1,0 +1,29 @@
+<%- include header %>
+
+
+<% users.forEach(function(iuser,index){%>
+	<form action="/changenumber" method="post">
+    	<input type="text" name="id"  readonly  unselectable="on" style="background-color:#D1D1D1;" class="<%= iuser._id %>" value="<%= iuser.iid %>">
+        <input type="text" name="name" value="<%= iuser.name %>" />
+        <input type="text" name="email" value="<%= iuser.email %>" />
+        <input type="text" name="age" value="<%= iuser.age %>" />
+
+       <select name="department">
+        <option value="<%= iuser.idepartment %>"><%= iuser.idepartment %></option>
+         <% des.forEach(function(department,index){%>
+        <option value="<%= department.name %>"><%= department.name %></option>
+         <% }) %>
+        </select>
+       
+        <input type="text" name="day" value="<%= iuser.idate.day %>" />
+        <input type="text" name="place" value="<%= iuser.place %>" />
+        <input type="text" name="role" value="<%= iuser.irole %>" />
+        <input type="submit" value="修改" style="margin-right: 5em;" />
+    </form>
+    <a href="/deletenumber/<%=iuser.iid %>/<%=iuser.idepartment %>" class="dele" />删除</a>
+<br>
+<% }) %>
+
+
+<%- include paging %>
+<%- include footer %>

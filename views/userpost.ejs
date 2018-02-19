@@ -1,0 +1,22 @@
+<%- include header %>
+<% posts.forEach(function (post,index) {%>
+<p><h2><a href="/u/<%= post.iid %>/<%=post.time.day %>/<%= post.title %>"><%= post.title %></a></h2><a href="/u/<%= post.iid %>"><img src="<%= post.head %>" class="r_head" /></a></p>
+<p calss="info">
+    账号：<a href="/u/<%= post.iid %>"><%= post.iid %></a>
+    作者：<a href="/u/<%= post.iid %>"><%= post.name %></a>
+    日期：<%= post.time.minute %>
+    标签：
+    <% post.tags.forEach(function(tag,index){ %>
+    <% if (tag) { %>
+    <a class="tag" href="/tags/<%= tag %>"><%=tag %></a>
+    <% } %>
+    <% }) %>
+</p>
+<p><%- post.post %></p>
+<p class="info">阅读：<%=post.pv %>  |   评论: <%= post.comments.length %></p>
+<% }) %>
+<%- include paging %>
+<%- include footer %>
+
+
+

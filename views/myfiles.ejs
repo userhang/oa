@@ -1,0 +1,17 @@
+<%- include header %>
+
+
+<% files.forEach(function(file,index){%>
+	<form action="/downloadfile" method="post">
+    	<input type="text" name="name"  readonly  unselectable="on" style="background-color:#D1D1D1;" class="<%= file._id %>" value="<%= file.name %>">
+        <input type="text" name="filename" value="<%= file.filename %>" />
+        <input type="submit" value="文件下载" style="margin-right: 5em;" />
+       
+    </form>
+    <a href="/deletefile/<%=file.name %>/<%=file.filename %>" class="dele" />删除</a>
+<br>
+<% }) %>
+
+
+<%- include paging %>
+<%- include footer %>

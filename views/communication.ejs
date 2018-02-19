@@ -1,0 +1,24 @@
+<%- include header %>
+<a class="tag" href="/imessage">返回</a>
+<br/>
+<% messages.imessage.forEach(function(information,index){%>
+
+
+  <% if (information.seid==messages.reid) { %>
+      <span class="info" style="float:right" ><%= information.seid %>：<%= information.message %></span></p><br/>
+     
+    <% } else { %>
+      
+    <span class="info" ><%= information.seid %>：<%= information.message %></span></p><br/>
+    <% } %>
+
+<% }) %>
+<form method="post" action="/imessage">
+发送给：<input type="text" name="reid" readonly  unselectable="on" value="<%=messages.seid %>"/><br/>
+消息：<input type="text" name="message" /><br/>
+<input type="submit" value="发送" />
+</form>
+<%- include footer %>
+
+
+

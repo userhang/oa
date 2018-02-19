@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  	<meta charset="utf-8">
+    <title>Blog</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+
+  	<header>
+	   <h1><%= title %></h1>
+  	</header> 
+    <nav>
+    	<span><a title="主页" href="/">主页</a></span>
+    	<span><a title="存档" href="/archive">存档</a><span>
+    	<span><a title="部门" href="/department">部门公告</a></span>
+      <span><a title="消息" href="/imessage">消息</a></span>
+    <span>
+    <% if (user) { %>
+      <span><a title="部门人员管理" href="/viewinnumber">部门人员查看</a></span>
+      <span><a title="上传" href="/upload">我的云盘</a></span>
+        <span><a title="上传" href="/u/<%= user.iid %>">我的公告</a></span>
+        <span><a title="发表" href="/post">发表</a></span>
+      <span><a title="登出" href="/logout">登出</a></span>
+    <% } else { %>
+      <span><a title="登入" href="/login">登入</a></span>
+      <span><a title="注册" href="/reg">注册</a></span>
+    <% } %>
+
+       <% if (department=='销售部') { %>
+       <span><a title="标签" href="/tags">标签</a></span>
+      <span><a title="人员管理" href="/allpeople">公司人员管理</a></span>
+       <span><a title="人员管理" href="/viewnumber">公司人员查看</a></span>
+      <span><a title="公告管理" href="/postmanage">公告管理</a></span>
+       <span><a title="部门管理" href="/departmentmanage">部门管理</a></span>
+    <% } %>
+
+    <% if (role==1) { %>
+      <span><a title="部门人员管理" href="/inpeople">部门人员管理</a></span>
+      <span><a title="部门公告管理" href="/inpostmanage">部门公告管理</a></span>
+    <% } %>
+
+      <span><a title="个人信息管理" href="/personal">个人信息管理</a></span>
+      <span><a title="友情链接" href="/links">友情链接</a></span>
+    </span>
+    </nav>
+   
+  <article>
+    <% if (success) {%>
+    <div><%=success %></div>
+    <%} %>
+    <% if (error) {%>
+    <div><%=error %></div>
+    <%} %>
+
+ 

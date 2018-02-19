@@ -1,0 +1,13 @@
+<br />
+附件：<br />
+<% post.files.forEach(function(file,index){%>
+<div style="padding-left:4em;">
+
+<p><a href="/downloadfile/<%= post.iid %>/<%= post.title %>/<%= file.files1 %>"><%= file.files1 %></a></p>
+<p><a href="/downloadfile/<%= post.iid %>/<%= post.title %>/<%= file.files2 %>"><%= file.files2 %></a></p>
+<p><a href="/downloadfile/<%= post.iid %>/<%= post.title %>/<%= file.files3 %>"><%= file.files3 %></a></p>
+<p><a href="/downloadfile/<%= post.iid %>/<%= post.title %>/<%= file.files4 %>"><%= file.files4 %></a></p>
+<p><a href="/downloadfile/<%= post.iid %>/<%= post.title %>/<%= file.files5 %>"><%= file.files5 %></a></p>
+
+</div>
+<% }) %>
