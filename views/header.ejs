@@ -4,11 +4,22 @@
   	<meta charset="utf-8">
     <title>Blog</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+     <link rel='stylesheet' href='/stylesheets/jquery.Jcrop.css' />
+      <link rel='stylesheet' href='/stylesheets/changehead.css' />
+   
+    <script src="/javascripts/jquery.js"></script>
+     <script src="/javascripts/jquery.Jcrop.js"></script>
+     <script src="/javascripts/bootstrap.js"></script>
+      <script src="/javascripts/angular.min.js"></script>
+    
   </head>
   <body>
 
   	<header>
 	   <h1><%= title %></h1>
+      <% if (user) { %>
+     <h4><%= user.iid %>(<%= user.name %>)</h4>
+     <% } %>
   	</header> 
     <nav>
     	<span><a title="主页" href="/">主页</a></span>
@@ -32,7 +43,8 @@
       <span><a title="人员管理" href="/allpeople">公司人员管理</a></span>
        <span><a title="人员管理" href="/viewnumber">公司人员查看</a></span>
       <span><a title="公告管理" href="/postmanage">公告管理</a></span>
-       <span><a title="部门管理" href="/departmentmanage">部门管理</a></span>
+      <span><a title="部门管理" href="/departmentmanage">部门管理</a></span>
+      <span><a title="审核人员" href="/undetermined">审核人员</a></span>
     <% } %>
 
     <% if (role==1) { %>

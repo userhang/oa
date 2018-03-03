@@ -1,0 +1,140 @@
+<%- include header %>
+  
+
+
+  
+<div class="uploadPics">  
+    <img src="../images/AvatarClose.png" alt="" onclick="ClosePage()" />  
+    <div class="picTil">上传头像</div>  
+    <div class="picCont" style="width:300px;height:300px;margin:20px auto 0;padding:0;" >  
+        <div id=imgfield  style=overflow:hidden;width:100%;height:100% ></div>  
+    </div>  
+    <div class="picFooter">  
+        <input type="file" id="fileimg" name="fileimg" style="display:none" onchange="imgchange()" />  
+  
+        <span class="btn upload"  onclick="getimg()">上传</span>  
+        <span class="btn confirm" onclick="subform()">确认</span>  
+  
+    </div>  
+  
+</div>  
+  
+<canvas id="myCan" width="200" height="200"></canvas>  
+  
+
+  
+  
+  
+  </article>
+  </body>
+<script src="/javascripts/jquery.js"></script>
+<script src="/javascripts/jquery.Jcrop.js"></script>
+<script type="text/javascript">  
+    function subform() {  
+  
+        if($("#imgfield").html()){ 
+         var data=document.getElementById("myCan").toDataURL();   
+         $.ajax({  
+            type: "post",  
+            url: "/uploadhead",  
+            data: {imagename: data},  
+            dataType: "json"  ,
+            success :function(e){
+            alert(e);//不执行
+            history.back(-1);
+            },
+        });  
+        }else{ 
+            alert("请选择图片!")  
+        }  
+  
+    }  
+  
+  
+    function getimg() {  
+  
+        $("#fileimg").click();  
+  
+    }  
+    function imgchange() {  
+  
+        var localimg = $("#fileimg").get(0).files[0];  
+  
+        if(!localimg){  
+            return;  
+        }  
+  
+        var fileName = localimg.name;  
+        var fileSize = localimg.size;  
+        var fileType=fileName.substring(fileName.lastIndexOf('.'),fileName.length).toLowerCase();  
+        if(fileType!='.gif' && fileType!='.jpeg' && fileType!='.png' && fileType!='.jpg')  
+        {  
+            alert("上传失败，请上传jpg,png格式的图片");  
+            return;  
+        }  
+  
+        var size=3*1024*1024;  
+        if(fileSize>size){  
+            alert("上传失败，请上传3MB以内的图片。");  
+            return;  
+        }  
+  
+        var reader=new FileReader();  
+        //将文件读取为DataURL  
+        reader.readAsDataURL(localimg);  
+        reader.onload= function (e) {  
+            var localimghtml = '<img id="cropbox" src="' +  e.target.result + '" >';  
+            $("#imgfield").html(localimghtml);  
+            initJcrop();  
+        };  
+  
+    }  
+  
+  
+    function initJcrop(){  
+        $('#cropbox').Jcrop({  
+            onSelect: updateCoords,  
+            aspectRatio: 1,  
+            boxWidth: 300,  
+            boxHeight: 300  
+        }, function () {  
+  
+            //图片实际尺寸  
+            var bb = this.getBounds();  
+            var bWidth= Number(bb[0]) / 2;  
+            var bHeight= Number(bb[1]) / 2;  
+  
+            this.setSelect([0, 0, bWidth,bHeight]);  
+  
+  
+            var ss = this.getWidgetSize();  
+            var aheight = (300 - Number(ss[1])) / 2 + "px";  
+            $(".jcrop-holder").css("margin-top", aheight);  
+  
+  
+        });  
+    }  
+    function updateCoords(c){  
+//      console.log(c);  
+        var img=document.getElementById("cropbox");  
+        var ctx=document.getElementById("myCan").getContext("2d");  
+  
+        //img,开始剪切的x,Y坐标宽高，放置图像的x,y坐标宽高。  
+        ctx.drawImage(img,c.x,c.y, c.w, c.h,0,0,200,200);  
+    }  
+  
+  
+  
+    //**dataURL to blob**  
+    function dataURLtoBlob(dataurl) {  
+        var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],  
+                bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);  
+        while (n--) {  
+            u8arr[n] = bstr.charCodeAt(n);  
+        }  
+        return new Blob([u8arr], { type: mime });  
+    }  
+  
+  
+</script>  
+</html>

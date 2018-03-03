@@ -121,11 +121,44 @@ module.exports = function(app){
 	    	    req.flash('error','密码错误');
 	    	    return res.redirect('/login');
 	        }
-	        req.session.department=department;
+	        if (department =='待定') {
+	    	    req.flash('error','请等待管理员审核通过');
+	    	    return res.redirect('/login');
+	        }
+	        var path='./public/head/'+req.body.id;
+
+	        fs.exists(path,function(exists){
+	        if(exists){
+            var pathnamefile='./public/head/'+req.body.id+'/'+'head.png';
+			var target_path ='./public/'+'head.jpg';
+			//转移文件
+			fs.writeFileSync(pathnamefile, fs.readFileSync(target_path));
+            req.session.department=department;
 	        req.session.role=role;
 	        req.session.user=user;
 	        req.flash('success','登入成功');
 	        res.redirect('/');
+	        }
+
+	        if(!exists){
+            fs.mkdir(path,function(err){
+            if (err) {
+            			console("创建失败"+err);
+            	}
+    		var pathnamefile='./public/head/'+req.body.id+'/'+'head.png';
+			var target_path ='./public/'+'head.jpg';
+			//转移文件
+			fs.writeFileSync(pathnamefile, fs.readFileSync(target_path));
+            req.session.department=department;
+	        req.session.role=role;
+	        req.session.user=user;
+	        req.flash('success','登入成功');
+	        res.redirect('/');
+            });
+	        }
+
+	        });
+            
 	    });
 	});
 		  
@@ -175,6 +208,18 @@ module.exports = function(app){
 
 	app.post('/upload',checkLogin);
 	app.post('/upload',function(req,res){
+		console.log(12345);
+		console.log(req.body.imagename);
+		var imgData = req.body.imagename;
+		var base64Data = imgData.replace(/^data:image\/\w+;base64,/, "");
+	    var dataBuffer = new Buffer(base64Data, 'base64');
+		fs.writeFile("out.png", dataBuffer, function(err) {
+		if(err){
+		  res.send(err);
+		}else{
+		  res.send("保存成功！");
+		}
+	    });
 		for (var i in req.files) {
 			if (req.files[i].size == 0) {
 				//使用同步方式删除一个文件
@@ -217,6 +262,43 @@ module.exports = function(app){
 			}
 			
 		};
+	});
+
+	app.post('/uploadhead',checkLogin);
+	app.post('/uploadhead',function(req,res){
+		var imgData = req.body.imagename;
+		var base64Data = imgData.replace(/^data:image\/\w+;base64,/, "");
+	    var dataBuffer = new Buffer(base64Data, 'base64');
+		var path='./public/head/'+req.session.user.iid;
+		fs.exists(path,function(exists){
+        if(exists){
+                console.log("目录存在");
+                fs.writeFile('./public/head/'+req.session.user.iid+'/'+'head.png', dataBuffer, function(err) {
+				if(err){
+				 console.log("失败"+err);
+				}else{
+				 console.log("kaishi");
+				 res.json('图片上传成功');
+				}
+	            });
+            }
+        if(!exists){
+
+            fs.mkdir(path,function(err){
+            		if (err) {
+            			console("创建失败"+err);
+            		}
+            		fs.writeFile('./public/head/'+req.session.user.iid+'/'+'head.png', dataBuffer, function(err) {
+					if(err){
+					 console.log("失败"+err);
+					}else{
+					 console.log("kaishi");
+					 res.json('图片上传成功');
+					}
+		    });
+            });
+        };
+        });
 	});
 
 
@@ -342,6 +424,34 @@ module.exports = function(app){
 		});	
 	});
 
+
+	app.get('/undetermined',function(req,res){
+        var page=req.query.p ? parseInt(req.query.p) :1;
+		Department.getchoice(function(err,des){
+			if (err) {
+				des=[];
+			}
+			User.getundetermined(page,function(err,users,total){
+			if (err) {
+				users=[];
+			}
+			res.render('allpeople',{
+				title:'主页',
+				users:users,
+				des:des,
+				page:page,
+				isFirstPage:(page-1)==0,
+			    isLastPage:((page-1)*10+users.length)==total,
+				user:req.session.user,
+				department:req.session.department,
+                role:req.session.role,
+				success:req.flash('success').toString(),
+			    error:req.flash("error").toString()
+			});
+		});	
+		});	
+	});
+
 	app.get('/departmentmanage',function(req,res){
 			var page=req.query.p ? parseInt(req.query.p) :1;
 		Department.getTen(page,function(err,departments,total){
@@ -428,8 +538,10 @@ module.exports = function(app){
 	app.get('/deletenumber/:id/:department',function(req,res){
 		var path1='./public/images/'+req.params.department+'/'+req.params.id;
 		var path2='./public/postfiles/'+req.params.id;
+		var path3='./public/head/'+req.params.id;
 		deleteFolderRecursive(path1);
 		deleteFolderRecursive(path2);
+		deleteFolderRecursive(path3);
 		
 		User.remove(req.params.id,function(err){
 			if (err) {
@@ -484,13 +596,26 @@ module.exports = function(app){
 	 
 	});
 
+	app.get('/changehead',checkLogin);
+	app.get('/changehead',function(req,res){
+	    	res.render('changehead',{
+				title:'主页',
+				user:req.session.user,
+				department:req.session.department,
+                role:req.session.role,
+				success:req.flash('success').toString(),
+			    error:req.flash("error").toString()
+			});
+	 
+	});
+
 
 	app.post('/prechange',function(req,res){	
 		var age = parseInt(req.body.age);
 		 //生成密码的MD5值
 	    var md5=crypto.createHash('md5'),
 	        password=md5.update(req.body.password).digest('hex');
-		User.updateone(req.body.id,req.body.name,req.body.email,age,req.body.place,password,function(err){
+		User.updateone(req.body.id,req.body.name,req.body.email,age,req.body.place,req.body.phone,password,function(err){
 			if (err) {
 				req.flash('error',err);
 				return res.redirect('back');
@@ -967,6 +1092,7 @@ module.exports = function(app){
     app.get('/imessage',checkLogin);
 	app.get('/imessage',function(req,res){
 	var page=req.query.p ? parseInt(req.query.p) :1;
+	User.getall(function(err,alluser){
     Messages.getTen(page,req.session.user.iid,function(err,messages,total){
 			if (err) {
 				posts=[];
@@ -974,6 +1100,7 @@ module.exports = function(app){
 			res.render('message',{
 				title:'主页',
 				messages:messages,
+				alluser:alluser,
 				page:page,
 				isFirstPage:(page-1)==0,
 			    isLastPage:((page-1)*10+messages.length)==total,
@@ -984,6 +1111,7 @@ module.exports = function(app){
 			    error:req.flash("error").toString()
 			});
 		});
+    });
     });
 
     app.post('/imessage',function(req,res){
@@ -997,10 +1125,10 @@ module.exports = function(app){
 		time=date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+""+date.getHours()+":"+(date.getMinutes() < 10 ? ('0' +date.getMinutes()) : date.getMinutes());
 	    Messages.get(req.body.reid,req.session.user.iid,function(err,itok){
 	    	if (itok) {
-	        console.log("111111111111");
             var messages ={
 			reid:ireid,
 			seid:iseid,
+			sename:req.session.user.name,
 			time:time,
 			message:req.body.message
 		    };
@@ -1009,6 +1137,7 @@ module.exports = function(app){
             var messages ={
 			reid:ireid,
 			seid:iseid,
+			sename:req.session.user.name,
 			time:time,
 			message:req.body.message
 		    };
@@ -1056,6 +1185,7 @@ module.exports = function(app){
     	    var messages ={
 			reid:req.body.reid,
 			seid:req.session.user.iid,
+			sename:req.session.user.name,
 			time:time,
 			message:req.body.message
 		    };
@@ -1074,6 +1204,7 @@ module.exports = function(app){
 			var messages ={
 			reid:req.body.reid,
 			seid:req.session.user.iid,
+			sename:req.session.user.name,
 			time:time,
 			message:req.body.message
 		    };

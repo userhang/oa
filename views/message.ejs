@@ -1,8 +1,16 @@
 <%- include header %>
 <form method="post">
-账号名：<input type="text" name="reid" /><br/>
+<div ng-app="">
+账号名：<input type="text" name="reid" value={{name}}>
+<select name="changereid" ng-model="name">
+         <% alluser.forEach(function(user,index){%>
+        <option value="<%= user.iid %>"><%= user.iid %>(<%= user.name %>)</option>
+         <% }) %>
+</select>
+<br/>
 消息：<input type="text" name="message" /><br/>
 <input type="submit" value="发送" />
+</div>
 </form>
 <br>
 <hr>

@@ -6,11 +6,14 @@
     "start": "node app.js"
   },
   "dependencies": {
-    "express": "3.21.2",
-    "ejs": "*",
-    "mongodb": "2.2.9",
-    "connect-mongo": "0.8.2",
+    "angular": "*",
+    "bootstrap": "3.3.7",
     "connect-flash": "*",
-    "markdown": "*"
+    "connect-mongo": "0.8.2",
+    "ejs": "*",
+    "express": "3.21.2",
+    "jquery": "^3.3.1",
+    "markdown": "*",
+    "mongodb": "2.2.9"
   }
 }

@@ -35,10 +35,11 @@ User.prototype.save=function(callback){
 		email:this.email,
 		head:head,
 		age:18,
-	    idepartment:'销售部',
+		phone:'更改你的号码',
+	    idepartment:'待定',
 	    idate:time,
-	    place:'乐山',
-	    irole:1
+	    place:'更改你的籍贯',
+	    irole:2
 	};
 	//打开数据库
 	mongodb.open(function(err,db){
@@ -103,6 +104,33 @@ User.get=function(id,callback){
 	});
 };
 
+User.getall =function(callback){
+	//打开数据库
+	mongodb.open(function(err,db){
+		if (err) {
+			return callback(err);//错误，返回错误信息
+		}
+	//读取集合
+	    db.collection('users',function(err,collection){
+			if (err) {
+				mongodb.close();
+				return callback(err);//错误，返回错误信息
+			}
+	        var query={};
+	    	
+	    	collection.find(query).sort({
+	    		time:-1
+	    	}).toArray(function(err,docs){
+	    		mongodb.close();
+	    		if (err) {
+	    			return callback(err);
+	    		}
+	    		callback(null,docs);
+	    	});
+	    })      
+	    });
+};
+
 
 
 User.getTen =function(page,callback){
@@ -164,6 +192,44 @@ User.getdeparpeople =function(department,page,callback){
 	    		if (err) {
 	    			return callback(err);
 	    		}
+	    		callback(null,docs,total);
+	    	});
+	    })      
+	    });
+	  	});
+};
+
+
+
+User.getundetermined =function(page,callback){
+	//打开数据库
+	mongodb.open(function(err,db){
+		if (err) {
+			return callback(err);//错误，返回错误信息
+		}
+	//读取集合
+	
+	    db.collection('users',function(err,collection){
+			if (err) {
+				mongodb.close();
+				return callback(err);//错误，返回错误信息
+			}
+	        var query={};
+		   
+		    query.idepartment='待定';
+		   
+	    	collection.count(query,function(err,total){
+	    	collection.find(query,{
+	    		skip:(page-1)*10,
+	    		limit:10
+	    	}).sort({
+	    		time:-1
+	    	}).toArray(function(err,docs){
+	    		mongodb.close();
+	    		if (err) {
+	    			return callback(err);
+	    		}
+	    		
 	    		callback(null,docs,total);
 	    	});
 	    })      
@@ -239,7 +305,7 @@ User.update=function(id,name,email,age,department,day,place,role,callback){
 };
 
 
-User.updateone=function(id,name,email,age,place,password,callback){
+User.updateone=function(id,name,email,age,place,phone,password,callback){
 	mongodb.open(function(err,db){
 		if (err) {
 			return callback(err);
@@ -259,6 +325,7 @@ User.updateone=function(id,name,email,age,place,password,callback){
 			"email":email,
 			"age":age,
 			"place":place,
+			"phone":phone,
 			"password":password
 			}
 		},function(err){
@@ -309,8 +376,6 @@ User.searchnumber =function(id,name,department,place,age,callback){
 				query.place=place;
 				console.log(query.place);
 			}
-	       
-		   console.log(query);
 		  
 	    	collection.find(query).sort({
 	    		time:-1
