@@ -1176,7 +1176,6 @@ module.exports = function(app){
 
             });
 	    	}else{
-	        console.log("2222222222");
 	    	newMessage.save(function(err,messageall){
     		if (err) {
     			req.flash('error',err);
@@ -1247,6 +1246,32 @@ module.exports = function(app){
 				return res.redirect('back');
 			    }
 			res.render('communication',{
+			title:'主页',
+			messages:messages,
+			department:req.session.department,
+            role:req.session.role,
+			user:req.session.user,
+			success:req.flash('success').toString(),
+		    error:req.flash("error").toString()
+			});
+
+
+			});
+		});
+    	
+    });
+
+    app.post('/messagehistory',function(req,res){
+        Messages.findone(req.body.seid,req.session.user.iid,function(err,messages){
+			if (err) {
+				messages=[];
+			}
+			Messages.updatesignno(req.body.seid,req.session.user.iid,function(err){
+            if (err) {
+				req.flash('error',err);
+				return res.redirect('back');
+			    }
+			res.render('comhistory',{
 			title:'主页',
 			messages:messages,
 			department:req.session.department,

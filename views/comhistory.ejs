@@ -2,11 +2,7 @@
 <a class="tag" href="/imessage">返回</a>
 <br/>
  <% for(var key in messages.imessage){%>
-<% if (key==10) { 
-console.log(key);
-break;
 
-}%>
   <% if (messages.imessage[key].seid==messages.reid) { %>
       <span class="info" style="float:right" ><%= messages.imessage[key].seid %>：<%= messages.imessage[key].message %></span></p><br/>
      
@@ -17,20 +13,6 @@ break;
 
  <%}%>
 
-
-
-<form method="post" action="/messagehistory">
-账号：<input type="text" name="seid" readonly  unselectable="on" value="<%=messages.seid %>"/>
-<input type="submit" value="历史记录" />
-</form>
-<br>
-<hr>
-<br>
-<form method="post" action="/imessage">
-发送给：<input type="text" name="reid" readonly  unselectable="on" value="<%=messages.seid %>"/><br/>
-消息：<input type="text" name="message" /><br/>
-<input type="submit" value="发送" />
-</form>
 <%- include footer %>
 
 
