@@ -1,19 +1,174 @@
-<%- include header %>
-<a class="tag" href="/imessage">返回</a>
-<br/>
- <% for(var key in messages.imessage){%>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
 
-  <% if (messages.imessage[key].seid==messages.reid) { %>
-      <span class="info" style="float:right" ><%= messages.imessage[key].seid %>：<%= messages.imessage[key].message %></span></p><br/>
-     
-    <% } else { %>
-      
-    <span class="info" ><%= messages.imessage[key].seid %>(<%= messages.imessage[key].sename %>)：<%= messages.imessage[key].message %></span></p><br/>
-    <% } %>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OA管理系统</title>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
+<link rel="stylesheet" type="text/css" href="/stylesheets/font-awesome.min.css">
+<link rel="apple-touch-icon-precomposed" href="/icon/icon.png">
+<link rel="shortcut icon" href="/icon/favicon.ico">
+<script src="/javascripts/jquery.js"></script>
+<script src="/javascripts/angular.min.js"></script>
+</head>
 
- <%}%>
+<body class="user-select">
+<section class="container-fluid">
+  <header>
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false"> <span class="sr-only">切换导航</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+          <a class="navbar-brand" href="/">OA系统</a> </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown"> <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">账号<span class="caret"></span></a>
+              <ul class="dropdown-menu dropdown-menu-left">
+                <li><a href="/personal">个人信息</a></li>
+              </ul>
+            </li>
+            <li><a href="/logout" onClick="if(!confirm('是否确认退出？'))return false;">退出登录</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <div class="row">
+    <aside class="col-sm-3 col-md-2 col-lg-2 sidebar">
 
-<%- include footer %>
+      <ul class="nav nav-sidebar">
+        <li class="active"><a href="/">主页</a></li>
+      </ul>
+
+      <ul class="nav nav-sidebar">
+        <li><a href="/archive">存档</a></li>
+        <li><a href="/upload">云盘</a></li>
+        <li><a href="/department">部门公告</a></li>
+          <li><a href="/u/<%= user.iid %>">我的公告</a></li>
+        <li><a href="/imessage">消息</a></li>
+        <li><a href="/viewinnumber">部门人员查看</a></li>
+        <li><a href="/post">发表</a></li>
+      </ul>
+
+     <% if (role==1) { %>
+      <ul class="nav nav-sidebar">
+        <li><a class="dropdown-toggle" id="otherMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">部门</a>
+          <ul class="dropdown-menu" aria-labelledby="otherMenu">
+           <li><a href="/inpeople">部门人员管理</a></li>
+            <li><a href="/inpostmanage">部门公告管理</a></li>
+          </ul>
+        </li>
+      </ul>
+      <% } %>
+
+      <% if (department=='销售部') { %>
+      <ul class="nav nav-sidebar">
+        <li><a class="dropdown-toggle" id="userMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">公司管理</a>
+          <ul class="dropdown-menu" aria-labelledby="userMenu">
+           <li><a href="/tags">标签</a></li>
+            <li><a href="/allpeople">公司人员管理</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="/viewnumber">公司人员查看</a></li>
+       <li><a href="/postmanage">公告管理</a></li>
+        <li><a href="/departmentmanage">部门管理</a></li>
+         <li><a href="/undetermined">审核人员</a></li>
+          </ul>
+         <% } %>
+
+        </li>
+        <li><a class="dropdown-toggle" id="settingMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">其他</a>
+          <ul class="dropdown-menu" aria-labelledby="settingMenu">
+            <li><a data-toggle="modal" data-target="#areDeveloping">新功能</a></li>
+            <li role="separator" class="divider"></li>
+         <li><a href="/links">友情链接</a></li>
+          </ul>
+        </li>
+      </ul>
+    </aside>
+
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-lg-10 col-md-offset-2 main" id="main">
+      <div class="row">
+          <div class="col-md-9">
+
+            <h1 class="page-header">消息</h1>
+
+              <div class="add-article-box">
+              <h2 class="add-article-box-title"><span>内容</span></h2>
+              <div class="add-article-box-content">
+
+              <% for(var key in messages.imessage){%>
+
+				
+
+				<% if (messages.imessage[key].seid==messages.reid) { %>
+				<span class="label label-primary" style="float:right" ><%= messages.imessage[key].message %></span><br/><br/>
+				     
+				<% } else { %>
+			      
+			    <span class="label label-primary" ><%= messages.imessage[key].seid %>(<%= messages.imessage[key].sename %>)：<%= messages.imessage[key].message %></span><br/><br/>
+
+			   <% } %>
+
+			<%}%>
+
+              </div>
+              </div>
+            </div>
+
+         
+
+          <div class="col-md-3">
+            <h1 class="page-header">操作</h1>
+            <form method="post" action="/imessage">
+            <div ng-app="">
+            <div class="add-article-box">
+              <h2 class="add-article-box-title"><span>发送消息</span></h2>
+
+              <div class="add-article-box-content">
+              <input type="text" name="reid" class="form-control" readonly  unselectable="on" value="<%=messages.seid %>">
+              </div>
+              <div class="add-article-box-content">
+              <input type="text" name="message" class="form-control" placeholder="在此处输入你要发送的消息"  autocomplete="off" />
+              </div>
+
+              <div class="add-article-box-content">
+              <button class="btn btn-primary" type="submit" name="submit">发送</button>
+              </div>
+            </div>
+            </form>
+          </div>
+       
+      </div>
+    </div>
+
+
+   
+  </div>
+</section>
 
 
 
+<!--提示模态框-->
+<div class="modal fade user-select" id="areDeveloping" tabindex="-1" role="dialog" aria-labelledby="areDevelopingModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="areDevelopingModalLabel" style="cursor:default;">该功能正在日以继夜的开发中…</h4>
+      </div>
+      <div class="modal-body"> <img src="images/baoman/baoman_01.gif" alt="深思熟虑" />
+        <p style="padding:15px 15px 15px 100px; position:absolute; top:15px; cursor:default;">很抱歉，程序猿正在日以继夜的开发此功能，本程序将会在以后的版本中持续完善！</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">朕已阅</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="/javascripts/bootstrap.js"></script> 
+<script src="/javascripts/admin-scripts.js"></script>
+</body>
+</html>

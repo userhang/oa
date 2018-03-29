@@ -80,7 +80,7 @@ User.get=function(id,callback){
 				mongodb.close();
 				return callback(err);//错误，返回错误信息
 			}
-	//查找用户名为name的一个文档
+	//查找用户名为name的一个文
 	    collection.findOne({
 		iid:id
 	    },function(err,user){
@@ -269,7 +269,7 @@ User.remove=function(id,callback){
 };
 
 
-User.update=function(id,name,email,age,department,day,place,role,callback){
+User.update=function(id,name,email,phone,age,department,day,place,role,callback){
 	mongodb.open(function(err,db){
 		if (err) {
 			return callback(err);
@@ -286,6 +286,7 @@ User.update=function(id,name,email,age,department,day,place,role,callback){
 			$set:{
 			"name":name,
 			"email":email,
+			"phone":phone,
 			"age":age,
 			"idepartment":department,
 			"idate.day":day,
@@ -340,6 +341,36 @@ User.updateone=function(id,name,email,age,place,phone,password,callback){
 	});
 };
 
+
+User.changecheck=function(id,department,callback){
+	mongodb.open(function(err,db){
+		if (err) {
+			return callback(err);
+		}
+		db.collection('users',function(err,collection){
+		if (err) {
+				mongodb.close();
+				return callback(err);
+			}
+			
+        collection.update({
+			"iid":id
+			
+		},{
+			$set:{
+			"idepartment":department
+			}
+		},function(err){
+			mongodb.close();
+			if (err) {
+				return callback(err);
+			}
+			callback(null);
+		});
+		});
+		
+	});
+};
 
 
 User.searchnumber =function(id,name,department,place,age,callback){

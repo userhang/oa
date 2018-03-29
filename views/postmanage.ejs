@@ -1,40 +1,199 @@
-<%- include header %>
-<% if (department=='销售部') { %>
-<div style="float:left;width:100%">
-<form action="/searchpost" method="post">
-<input type="text" name="id" placeholder="账号" class="search">
-<input type="text" name="name" placeholder="姓名" class="search">
-<input type="text" name="department" placeholder="部门" class="search">
-<input type="text" name="title" placeholder="标题" class="search" style="width:40%">
-<input type="submit" value="查询" />
-</form>
-</div>
-<hr>
-<br/>
-<% }else { %>
-<div style="float:left;width:100%">
-<form action="/searchpost" method="post">
-<input type="text" name="id" placeholder="账号" class="search">
-<input type="text" name="name" placeholder="姓名" class="search">
-<input type="text" name="title" placeholder="标题" class="search" style="width:40%">
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
 
-<input type="submit" value="查询" />
-</form>
-</div>
-<hr>
-<br/>
-<% } %>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OA管理系统</title>
+<link rel="stylesheet" type="text/css" href="/stylesheets/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
+<link rel="stylesheet" type="text/css" href="/stylesheets/font-awesome.min.css">
+<link rel="apple-touch-icon-precomposed" href="/icon/icon.png">
+<link rel="shortcut icon" href="/icon/favicon.ico">
+<script src="/javascripts/jquery.js"></script>
+</head>
 
-<ul class="archive">
-<% var lastYear =0 %>
-<% posts.forEach(function (post,index){ %>
-<% if(lastYear !=post.time.year){%>
-	<li><h3><%=post.time.year %></h3></li>
-	<% lastYear=post.time.year } %>
-	<li><time><%= post.time.day %></time></li>
-	<li><a href="/u/<%= post.iid %>/<%= post.time.day %>/<%=post.title %>"><%= post.title %></a></li>
-	<span><a class="edit" href="/remove/<%= post.iid %>/<%= post.time.day %>/<%=post.title %>">删除</a></span>
-<% }) %>
-</ul>	
-<%- include paging %>
-<%- include footer %>
+<body class="user-select">
+<section class="container-fluid">
+  <header>
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false"> <span class="sr-only">切换导航</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+          <a class="navbar-brand" href="/">OA系统</a> </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown"> <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">账号<span class="caret"></span></a>
+              <ul class="dropdown-menu dropdown-menu-left">
+                <li><a href="/personal">个人信息</a></li>
+              </ul>
+            </li>
+            <li><a href="/logout" onClick="if(!confirm('是否确认退出？'))return false;">退出登录</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <div class="row">
+    <aside class="col-sm-3 col-md-2 col-lg-2 sidebar">
+
+      <ul class="nav nav-sidebar">
+        <li class="active"><a href="/">主页</a></li>
+      </ul>
+
+      <ul class="nav nav-sidebar">
+        <li><a href="/archive">存档</a></li>
+        <li><a href="/upload">云盘</a></li>
+        <li><a href="/department">部门公告</a></li>
+          <li><a href="/u/<%= user.iid %>">我的公告</a></li>
+        <li><a href="/imessage">消息</a></li>
+        <li><a href="/viewinnumber">部门人员查看</a></li>
+        <li><a href="/post">发表</a></li>
+      </ul>
+
+     <% if (role==1) { %>
+      <ul class="nav nav-sidebar">
+        <li><a class="dropdown-toggle" id="otherMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">部门</a>
+          <ul class="dropdown-menu" aria-labelledby="otherMenu">
+           <li><a href="/inpeople">部门人员管理</a></li>
+            <li><a href="/inpostmanage">部门公告管理</a></li>
+          </ul>
+        </li>
+      </ul>
+      <% } %>
+
+      <% if (department=='销售部') { %>
+      <ul class="nav nav-sidebar">
+        <li><a class="dropdown-toggle" id="userMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">公司管理</a>
+          <ul class="dropdown-menu" aria-labelledby="userMenu">
+           <li><a href="/tags">标签</a></li>
+            <li><a href="/allpeople">公司人员管理</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="/viewnumber">公司人员查看</a></li>
+			 <li><a href="/postmanage">公告管理</a></li>
+			  <li><a href="/departmentmanage">部门管理</a></li>
+			   <li><a href="/undetermined">审核人员</a></li>
+          </ul>
+         <% } %>
+
+        </li>
+        <li><a class="dropdown-toggle" id="settingMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">其他</a>
+          <ul class="dropdown-menu" aria-labelledby="settingMenu">
+            <li><a data-toggle="modal" data-target="#areDeveloping">新功能</a></li>
+            <li role="separator" class="divider"></li>
+			   <li><a href="/links">友情链接</a></li>
+          </ul>
+        </li>
+      </ul>
+    </aside>
+
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-lg-10 col-md-offset-2 main" id="main">
+      <form action="/Article/checkAll" method="post" >
+        <h1 class="page-header">操作</h1>
+         <ol class="breadcrumb">
+          <li>
+          <% if (department=='销售部') { %>
+			
+			<form action="/searchpost" method="post">
+			<input type="text" name="id" placeholder="账号" class="search">
+			<input type="text" name="name" placeholder="姓名" class="search">
+			<input type="text" name="department" placeholder="部门" class="search">
+			<input type="text" name="title" placeholder="标题" class="search" >
+			<button class="btn btn-primary" type="submit" name="submit">查询</button>
+			</form>
+			
+			
+			<br/>
+			<% }else { %>
+			
+			<form action="/searchpost" method="post">
+			<input type="text" name="id" placeholder="账号" class="search">
+			<input type="text" name="name" placeholder="姓名" class="search">
+			<input type="text" name="department" placeholder="部门" readonly  unselectable="on" class="search" value="<%=department %>">
+			<input type="text" name="title" placeholder="标题" class="search" >
+			<button class="btn btn-primary" type="submit" name="submit">查询</button>
+			</form>
+			
+			
+			<br/>
+			<% } %>
+			</li>
+        </ol>
+        <h1 class="page-header">管理 </h1>
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+               
+                <th><span class="glyphicon glyphicon-file"></span> <span class="visible-lg">标题</span></th>
+                <th><span class="glyphicon glyphicon-list"></span> <span class="visible-lg">评论数</span></th>
+                <th class="hidden-sm"><span class="glyphicon glyphicon-tag"></span> <span class="visible-lg">标签</span></th>
+                <th class="hidden-sm"><span class="glyphicon glyphicon-comment"></span> <span class="visible-lg">阅读数</span></th>
+                <th><span class="glyphicon glyphicon-time"></span> <span class="visible-lg">日期</span></th>
+                <th><span class="glyphicon glyphicon-pencil"></span> <span class="visible-lg">作者</span></th>
+                <th><span class="glyphicon glyphicon-th-large"></span> <span class="visible-lg">操作</span></th>
+              </tr>
+            </thead>
+            <tbody>
+            <% var lastYear =0 %>
+            <% posts.forEach(function (post,index) {%>
+            <% if(lastYear !=post.time.year){%>
+            <li><h3><%=post.time.year %></h3></li>
+	           <% lastYear=post.time.year } %>
+              <tr>
+
+                <td class="article-title"><a href="/u/<%= post.iid %>/<%=post.time.day %>/<%= post.title %>"><%= post.title %></a></td>
+
+                <td><%= post.comments.length %> </td>
+
+    
+                <td class="hidden-sm"> <% post.tags.forEach(function(tag,index){ %>
+			    <% if (tag) { %>
+			    <span class="label label-success"><a class="tag" href="/tags/<%= tag %>"><%=tag %></a></span>
+			    <% } %>
+			    <% }) %>
+			    </td>
+
+                <td class="hidden-sm"><%=post.pv %> </td>
+
+                <td><%= post.time.minute %></td>
+
+                <td><a href="/u/<%= post.iid %>"><%= post.iid %></a></td>
+                  <td><a class="edit" href="/remove/<%= post.iid %>/<%= post.time.day %>/<%=post.title %>">删除</a></td>
+              </tr>
+              <% }) %>
+  
+            </tbody>
+          </table>
+        </div>
+        <footer class="message_footer">
+          <nav>
+            <ul class="pagination pagenav">
+            <% if(!isFirstPage) {%>
+			   <li class="disabled"><span class="prepage"><a title="上一页" href="?p=<%= page-1 %>">上一页</a></span></li>
+			<% }%>
+
+			<% if(!isLastPage) {%>
+			<li><span class="nextpage"><a title="下一页" href="?p=<%= page+1 %>">下一页</a></span></li>
+
+            <% }%>
+            
+            </ul>
+          </nav>
+        </footer>
+      </form>
+    </div>
+
+
+   
+  </div>
+</section>
+
+
+
+
+<script src="/javascripts/bootstrap.js"></script> 
+<script src="/javascripts/admin-scripts.js"></script>
+</body>
+</html>

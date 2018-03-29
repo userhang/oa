@@ -54,7 +54,7 @@ Messages.prototype.save=function(callback){
 	});
 };
 
-//读取文件信息
+//读取消息信息
 Messages.findone=function(seid,reid,callback){
 	//打开数据库
 	mongodb.open(function(err,db){
@@ -82,8 +82,8 @@ Messages.findone=function(seid,reid,callback){
 	});
 };
 
-
-Messages.get=function(oneid,twoid,callback){
+//查看是否有消息记录
+Messages.get=function(seid,reid,callback){
 	//打开数据库
 	mongodb.open(function(err,db){
 		if (err) {
@@ -97,8 +97,8 @@ Messages.get=function(oneid,twoid,callback){
 			}
 	//查找用户名为name的一个文档
 	    collection.findOne({
-		reid:oneid,
-		seid:twoid
+		seid:seid,
+		reid:reid
 	    },function(err,itok){
 		    mongodb.close();
             if (err) {
@@ -110,7 +110,7 @@ Messages.get=function(oneid,twoid,callback){
 	});
 };
 
-
+//消息人列表
 Messages.getTen =function(page,reid,callback){
 	//打开数据库
 	mongodb.open(function(err,db){
@@ -124,6 +124,7 @@ Messages.getTen =function(page,reid,callback){
 				return callback(err);//错误，返回错误信息
 			}
 	    var query={};
+	    console.log(reid);
 	    if (reid) {
 		    	query.reid=reid;
 		    }
@@ -147,8 +148,8 @@ Messages.getTen =function(page,reid,callback){
 
 
 
-//删除
-Messages.remove=function(name,filename,callback){
+//消息删除
+Messages.remove=function(seid,reid,callback){
 	mongodb.open(function(err,db){
 		if (err) {
 			return callback(err);
@@ -159,8 +160,8 @@ Messages.remove=function(name,filename,callback){
 				return callback(err);
 			}
         collection.remove({
-			"name":name,
-			"filename":filename
+			"seid":seid,
+			"reid":reid
 		},{
 			W:1
 		},function(err){
@@ -204,7 +205,7 @@ Messages.removealluser=function(name,callback){
 };
 
 
-//更新文章
+//更新消息时间
 Messages.updatetime=function(reid,seid,callback){
 	var date=new Date();
 
@@ -236,8 +237,6 @@ Messages.updatetime=function(reid,seid,callback){
 			if (err) {
 				return callback(err);
 			}
-			console.log(reid+seid);
-			 console.log(time);
 			callback(null);
 		});
 		});
@@ -245,7 +244,7 @@ Messages.updatetime=function(reid,seid,callback){
 	});
 };
 
-
+//更新消息状态
 Messages.updatesignno=function(seid,reid,callback){
 	mongodb.open(function(err,db){
 		if (err) {
@@ -268,15 +267,13 @@ Messages.updatesignno=function(seid,reid,callback){
 			if (err) {
 				return callback(err);
 			}
-			console.log(reid+seid);
-			
 			callback(null);
 		});
 		});
 		
 	});
 };
-
+//更新消息状态
 Messages.updatesignyes=function(seid,reid,callback){
 	mongodb.open(function(err,db){
 		if (err) {
@@ -299,8 +296,6 @@ Messages.updatesignyes=function(seid,reid,callback){
 			if (err) {
 				return callback(err);
 			}
-			console.log(reid+seid);
-			 
 			callback(null);
 		});
 		});

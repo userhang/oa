@@ -27,7 +27,7 @@ module.exports = function(app){
 			if (err) {
 				posts=[];
 			}
-			res.render('department',{
+			res.render('index',{
 				title:'主页',
 				posts:posts,
 				page:page,
@@ -87,7 +87,7 @@ module.exports = function(app){
 	    		}
 	    	
 	    		req.session.user=user;
-	    		req.flash('success','注册成功');
+	    		req.flash('success','注册成功，请等待管理员审核');
 	    		res.redirect('/login');
 	    	});
 	    });
@@ -113,7 +113,7 @@ module.exports = function(app){
 	        //检查用户名是否存在
 	    User.get(req.body.id,function(err,user,department,role){
 	    	if (!user) {
-	    		req.flash('error','用户名已存在');
+	    		req.flash('error','用户名不存在');
 	    		return res.redirect('/login');
 	    	}
 	    	//检查两次输入密码一样否？
@@ -190,64 +190,64 @@ module.exports = function(app){
             		if (err) {
             			console("创建失败"+err);
             		}
+
             	});
 		    });
             };
         });
-
-		res.render('upload',{
-			title:'文件上传',
-			user:req.session.user,
-			department:req.session.department,
-            role:req.session.role,
-			success:req.flash('success').toString(),
-			error:req.flash("error").toString()
+        var page=req.query.p ? parseInt(req.query.p) :1;
+        Files.getTen(req.session.user.iid,page,function(err,files,total){
+			if (err) {
+				files=[];
+			}
+			res.render('myfiles',{
+				title:'主页',
+				files:files,
+				page:page,
+				isFirstPage:(page-1)==0,
+			    isLastPage:((page-1)*10+files.length)==total,
+				user:req.session.user,
+				department:req.session.department,
+                role:req.session.role,
+				success:req.flash('success').toString(),
+			    error:req.flash("error").toString()
+			});
 		});
 	});
 
 
 	app.post('/upload',checkLogin);
 	app.post('/upload',function(req,res){
-		console.log(12345);
-		console.log(req.body.imagename);
-		var imgData = req.body.imagename;
-		var base64Data = imgData.replace(/^data:image\/\w+;base64,/, "");
-	    var dataBuffer = new Buffer(base64Data, 'base64');
-		fs.writeFile("out.png", dataBuffer, function(err) {
-		if(err){
-		  res.send(err);
-		}else{
-		  res.send("保存成功！");
-		}
-	    });
-		for (var i in req.files) {
-			if (req.files[i].size == 0) {
+		    console.log(req.files.file1.size);
+			if (req.files.file1.size == 0) {
 				//使用同步方式删除一个文件
-				fs.unlinkSync(req.files[i].path);
+				fs.unlinkSync(req.files.file1.path);
 				console.log('success removed an empty file!');
 			}else{
-				var filename=req.files[i].name;
+				var filename=req.files.file1.name;
 			    var newFiles =new Files({
 				name:req.session.user.iid,
-	    	    filename:req.files[i].name
+	    	    filename:req.files.file1.name
 	        	});
 		        //检查用户名是否存在
 			    Files.get(req.session.user.iid,filename,function(err,file){
 			    	if (file) {
+			    		console.log('errrrrr111111111');
 			    		req.flash('error','文件名已存在');
 			    		return res.redirect('/');
 			    	}
 			    	//如果不存在则加入新用户
 			    	newFiles.save(function(err,filename){
 			    		if (err) {
+			    			console.log('errrrrr');
 			    			req.flash('error',err);
 			    			return res.redirect('/upload');
 			    		}
-			    	});
-			    	var pathnamefile='./public/images/'+req.session.department+'/'+req.session.user.iid+'/'+req.files[i].name;
-					var target_path ='./public/tempt/'+req.files[i].name;
+			    
+			    	var pathnamefile='./public/images/'+req.session.department+'/'+req.session.user.iid+'/'+req.files.file1.name;
+					var target_path ='./public/tempt/'+req.files.file1.name;
 					//使用同步方式重命名一个文件
-					fs.renameSync(req.files[i].path,target_path);
+					fs.renameSync(req.files.file1.path,target_path);
 					//转移文件
 					fs.writeFileSync(pathnamefile, fs.readFileSync(target_path));
 					//删除文件
@@ -256,12 +256,13 @@ module.exports = function(app){
 							console.log("删除失败"+err);
 						}
 					})
+					console.log('hello');
 					req.flash('success','文件上传成功');
-					return res.redirect('/upload');
+		            return res.redirect('/upload');
+			    });
 			    });
 			}
-			
-		};
+		
 	});
 
 	app.post('/uploadhead',checkLogin);
@@ -279,6 +280,7 @@ module.exports = function(app){
 				}else{
 				 console.log("kaishi");
 				 res.json('图片上传成功');
+				 
 				}
 	            });
             }
@@ -294,6 +296,7 @@ module.exports = function(app){
 					}else{
 					 console.log("kaishi");
 					 res.json('图片上传成功');
+
 					}
 		    });
             });
@@ -303,7 +306,7 @@ module.exports = function(app){
 
 
 	app.get('/myfiles',function(req,res){
-			var page=req.query.p ? parseInt(req.query.p) :1;
+		var page=req.query.p ? parseInt(req.query.p) :1;
 		Files.getTen(req.session.user.iid,page,function(err,files,total){
 			if (err) {
 				files=[];
@@ -424,6 +427,28 @@ module.exports = function(app){
 		});	
 	});
 
+	app.get('/atpeople/:id',function(req,res){
+		Department.getchoice(function(err,des){
+			if (err) {
+				des=[];
+			}
+			User.get(req.params.id,function(err,users){
+			if (err) {
+				users=[];
+			}
+			res.render('atpeople',{
+				title:'主页',
+				des:des,
+				user:users,
+				department:req.session.department,
+                role:req.session.role,
+				success:req.flash('success').toString(),
+			    error:req.flash("error").toString()
+			});
+		});	
+		});	
+	});
+
 
 	app.get('/undetermined',function(req,res){
         var page=req.query.p ? parseInt(req.query.p) :1;
@@ -435,7 +460,7 @@ module.exports = function(app){
 			if (err) {
 				users=[];
 			}
-			res.render('allpeople',{
+			res.render('unpeople',{
 				title:'主页',
 				users:users,
 				des:des,
@@ -450,6 +475,17 @@ module.exports = function(app){
 			});
 		});	
 		});	
+	});
+
+	app.post('/changecheck',function(req,res){
+		User.changecheck(req.body.id,req.body.department,function(err){
+			if (err) {
+				req.flash('error',err);
+				return res.redirect('back');
+			}
+			req.flash('success','修改成功');
+			res.redirect('/undetermined');
+		});
 	});
 
 	app.get('/departmentmanage',function(req,res){
@@ -569,10 +605,9 @@ module.exports = function(app){
 
 	
 	app.post('/changenumber',function(req,res){
-		
 		var age = parseInt(req.body.age);
 		var role= parseInt(req.body.role);
-		User.update(req.body.id,req.body.name,req.body.email,age,req.body.department,req.body.day,req.body.place,role,function(err){
+		User.update(req.body.id,req.body.name,req.body.email,req.body.phone,age,req.body.department,req.body.day,req.body.place,role,function(err){
 			if (err) {
 				req.flash('error',err);
 				return res.redirect('back');
@@ -613,9 +648,15 @@ module.exports = function(app){
 	app.post('/prechange',function(req,res){	
 		var age = parseInt(req.body.age);
 		 //生成密码的MD5值
-	    var md5=crypto.createHash('md5'),
+	    var password=req.body.password;
+	    User.get(req.body.id,function(err,user,department,role){
+
+		if(user.password!=req.body.password){
+			var md5=crypto.createHash('md5');
 	        password=md5.update(req.body.password).digest('hex');
-		User.updateone(req.body.id,req.body.name,req.body.email,age,req.body.place,req.body.phone,password,function(err){
+	        }
+
+	    User.updateone(req.body.id,req.body.name,req.body.email,age,req.body.place,req.body.phone,password,function(err){
 			if (err) {
 				req.flash('error',err);
 				return res.redirect('back');
@@ -626,6 +667,10 @@ module.exports = function(app){
 	        res.redirect('/personal');
 	    });
 		});
+
+	    });
+	        
+		
 	});
 
 
@@ -681,7 +726,7 @@ module.exports = function(app){
 			        if(!exists){
 			            fs.mkdir(path2,function(err){
 		            		if (err) {
-		            			console("创建失败"+err);
+		            			console.log("创建失败"+err);
 		            		}
 		            		for (var i in req.files) {
 								if (req.files[i].size == 0) {
@@ -783,15 +828,12 @@ module.exports = function(app){
 	app.post('/u/:iid/:day/:title',function(req,res){
 		var date=new Date(),
 		time=date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+""+date.getHours()+":"+(date.getMinutes() < 10 ? ('0' +date.getMinutes()) : date.getMinutes());
-		var md5=crypto.createHash('md5'),
-	        email_MD5=md5.update(req.body.email.toLowerCase()).digest('hex'),
-	        head="http://www.gravatar.com/avatar/"+email_MD5+"?s=48";
+		var ahead=req.session.user.iid;
+		var head='/head/'+ahead+'/head.png';
 		var comment ={
 			iid:req.body.id,
 			name:req.body.name,
 			head:head,
-			email:req.body.email,
-			website:req.body.website,
 			time:time,
 			content:req.body.content
 		};
@@ -1089,6 +1131,7 @@ module.exports = function(app){
 		});	
 		
 	});
+	//查看消息所有联系人
     app.get('/imessage',checkLogin);
 	app.get('/imessage',function(req,res){
 	var page=req.query.p ? parseInt(req.query.p) :1;
@@ -1113,134 +1156,174 @@ module.exports = function(app){
 		});
     });
     });
-
+    //发送消息
     app.post('/imessage',function(req,res){
-        var newMessage =new Messages({
-	    	reid:req.body.reid,
-	    	seid:req.session.user.iid,
-	    });
-	    var ireid=req.body.reid;
+        var ireid=req.body.reid;
 	    var iseid=req.session.user.iid;
 	    var date=new Date(),
 		time=date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+""+date.getHours()+":"+(date.getMinutes() < 10 ? ('0' +date.getMinutes()) : date.getMinutes());
-	    Messages.get(req.body.reid,req.session.user.iid,function(err,itok){
+        var messages ={
+			reid:ireid,
+			seid:iseid,
+			sename:req.session.user.name,
+			time:time,
+			message:req.body.message
+		    };
+	
+	Messages.get(req.session.user.iid,req.body.reid,function(err,itok){
+		   
 	    	if (itok) {
-            var messages ={
-			reid:ireid,
-			seid:iseid,
-			sename:req.session.user.name,
-			time:time,
-			message:req.body.message
-		    };
-		    var newCommunication=new Communication(req.body.reid,req.session.user.iid,messages);
-            newCommunication.save(function(err){
-            var messages ={
-			reid:ireid,
-			seid:iseid,
-			sename:req.session.user.name,
-			time:time,
-			message:req.body.message
-		    };
+	    	console.log(000);
 		    var newCommunication=new Communication(req.session.user.iid,req.body.reid,messages);
             newCommunication.save(function(err){
-
-        	if (err) {
-				req.flash('error',err);
-				return res.redirect('back');
-		    }
-		    Messages.updatetime(req.body.reid,req.session.user.iid,function(err,itok){
-
+			Messages.updatetime(req.session.user.iid,req.body.reid,function(err,itok){
             if (err) {
 				req.flash('error',err);
 				return res.redirect('back');
 		    }
-		    Messages.updatetime(req.session.user.iid,req.body.reid,function(err,itok){
+			Messages.get(req.body.reid,req.session.user.iid,function(err,itok){
+			if (itok) {
+			console.log(001);
+			var newCommunication=new Communication(req.body.reid,req.session.user.iid,messages);
+			newCommunication.save(function(err){
+			Messages.updatetime(req.body.reid,req.session.user.iid,function(err,itok){
             if (err) {
 				req.flash('error',err);
 				return res.redirect('back');
 		    }
-		    Messages.updatesignno(req.body.reid,req.session.user.iid,function(err){
-		    Messages.updatesignyes(req.session.user.iid,req.body.reid,function(err){
-            req.flash('success','消息发送成功');
+			Messages.updatesignno(req.body.reid,req.session.user.iid,function(err){
+			Messages.updatesignyes(req.session.user.iid,req.body.reid,function(err){
+			
+			req.flash('success','消息发送成功');
 			res.redirect('/imessage');
-
-		    });
-            });
-
-		    });
-
-		    });
-
-
-            });
-
-            });
-	    	}else{
-	    	newMessage.save(function(err,messageall){
+			});
+			});
+			});
+			});
+			
+			}else{
+		    console.log(002);
+			var newMessage =new Messages({
+	    	reid:req.session.user.iid,
+	    	seid:req.body.reid,
+	        });
+			newMessage.save(function(err,messageall){
     		if (err) {
     			req.flash('error',err);
     			return res.redirect('/');
     		}
-    	    var messages ={
-			reid:req.body.reid,
-			seid:req.session.user.iid,
-			sename:req.session.user.name,
-			time:time,
-			message:req.body.message
-		    };
-		    var newCommunication=new Communication(req.body.reid,req.session.user.iid,messages);
-    		newCommunication.save(function(err){
-
-    		var newMessage =new Messages({
-			    	reid:req.session.user.iid,
-			    	seid:req.body.reid,
-			    });
-			newMessage.save(function(err,messageall){
-			    		if (err) {
-			    			req.flash('error',err);
-			    			return res.redirect('/');
-			    		}
-			var messages ={
-			reid:req.body.reid,
-			seid:req.session.user.iid,
-			sename:req.session.user.name,
-			time:time,
-			message:req.body.message
-		    };
-		    var newCommunication=new Communication(req.session.user.iid,req.body.reid,messages);
+			var newCommunication=new Communication(req.body.reid,req.session.user.iid,messages);
             newCommunication.save(function(err){
-            Messages.updatesignno(req.body.reid,req.session.user.iid,function(err){
-            Messages.updatesignyes(req.session.user.iid,req.body.reid,function(err){
+			Messages.updatetime(req.body.reid,req.session.user.iid,function(err,itok){
             if (err) {
 				req.flash('error',err);
 				return res.redirect('back');
-			    }
+		    }
+			Messages.updatesignno(req.body.reid,req.session.user.iid,function(err){
+			Messages.updatesignyes(req.session.user.iid,req.body.reid,function(err){
 			req.flash('success','消息发送成功');
 			res.redirect('/imessage');
-
-            });
-            });
-            });
-
 			});
-		});
-    	});
-
-
-	    };
-
+			});
+			});
+			});
+			});
+			
+			}
+			});
+			
+			
+			
+			});
+			});
+			}else{
+			console.log(110);
+			var newMessage =new Messages({
+	    	seid:req.session.user.iid,
+	    	reid:req.body.reid,
+	        });
+			
+			newMessage.save(function(err,messageall){
+    		if (err) {
+    			req.flash('error',err);
+    			return res.redirect('/');
+    		}
+		    var newCommunication=new Communication(req.session.user.iid,req.body.reid,messages);
+            newCommunication.save(function(err){
+			Messages.updatetime(req.session.user.iid,req.body.reid,function(err,itok){
+            if (err) {
+				req.flash('error',err);
+				return res.redirect('back');
+		    }
+			Messages.get(req.body.reid,req.session.user.iid,function(err,itok){
+			if (itok) {
+			console.log(111);
+			var newCommunication=new Communication(req.body.reid,req.session.user.iid,messages);
+			newCommunication.save(function(err){
+			Messages.updatetime(req.body.reid,req.session.user.iid,function(err,itok){
+            if (err) {
+				req.flash('error',err);
+				return res.redirect('back');
+		    }
+			Messages.updatesignno(req.body.reid,req.session.user.iid,function(err){
+			Messages.updatesignyes(req.session.user.iid,req.body.reid,function(err){
+			req.flash('success','消息发送成功');
+			res.redirect('/imessage');
+			});
+		    });
+			});
+			});
+			}else{
+			console.log(112);
+			var newMessage =new Messages({
+	    	seid:req.body.reid,
+	    	reid:req.session.user.iid,
+	        });
+			newMessage.save(function(err,messageall){
+    		if (err) {
+    			req.flash('error',err);
+    			return res.redirect('/');
+    		}
+			var newCommunication=new Communication(req.body.reid,req.session.user.iid,messages);
+            newCommunication.save(function(err){
+			Messages.updatetime(req.body.reid,req.session.user.iid,function(err,itok){
+            if (err) {
+				req.flash('error',err);
+				return res.redirect('back');
+		    }
+			Messages.updatesignno(req.body.reid,req.session.user.iid,function(err){
+			Messages.updatesignyes(req.session.user.iid,req.body.reid,function(err){
+			req.flash('success','消息发送成功');
+			res.redirect('/imessage');
+			});
+			});
+			});
+			});
+			});
+			
+			}
+			});
+			
+			
+			
+			});
+			});
+			});
+			}
+			
 	    });
+    	
     	
     });
 
-
-    app.post('/viewmessage',function(req,res){
+    //查看特定联系人消息
+    app.get('/viewmessage/:seid',function(req,res){
     	var page=req.query.p ? parseInt(req.query.p) :1;
-        Messages.findone(req.body.seid,req.session.user.iid,function(err,messages){
+        Messages.findone(req.params.seid,req.session.user.iid,function(err,messages){
 			if (err) {
 				messages=[];
 			}
-			Messages.updatesignno(req.body.seid,req.session.user.iid,function(err){
+			Messages.updatesignno(req.params.seid,req.session.user.iid,function(err){
             if (err) {
 				req.flash('error',err);
 				return res.redirect('back');
@@ -1260,13 +1343,13 @@ module.exports = function(app){
 		});
     	
     });
-
-    app.post('/messagehistory',function(req,res){
-        Messages.findone(req.body.seid,req.session.user.iid,function(err,messages){
+    //查看特定联系人历史消息
+    app.get('/messagehistory/:seid',function(req,res){
+        Messages.findone(req.params.seid,req.session.user.iid,function(err,messages){
 			if (err) {
 				messages=[];
 			}
-			Messages.updatesignno(req.body.seid,req.session.user.iid,function(err){
+			Messages.updatesignno(req.params.seid,req.session.user.iid,function(err){
             if (err) {
 				req.flash('error',err);
 				return res.redirect('back');
@@ -1280,9 +1363,18 @@ module.exports = function(app){
 			success:req.flash('success').toString(),
 		    error:req.flash("error").toString()
 			});
-
-
 			});
+		});
+    });
+    //删除联系人消息
+    app.get('/deletemessage/:seid',function(req,res){
+			Messages.remove(req.params.seid,req.session.user.iid,function(err){
+            if (err) {
+				req.flash('error',err);
+				return res.redirect('back');
+			    }
+			req.flash('success','消息删除成功');
+			return res.redirect('/imessage');
 		});
     	
     });
@@ -1292,7 +1384,7 @@ module.exports = function(app){
 	app.use(function(req,res){
     	res.render("404");
     })
-
+//删除文件夹下所有内容
     function deleteFolderRecursive(path) {
     if( fs.existsSync(path) ) {
         fs.readdirSync(path).forEach(function(file) {

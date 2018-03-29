@@ -73,6 +73,7 @@ Files.get=function(name,filename,callback){
 		name:name
 	    },function(err,file){
 		    mongodb.close();
+		    console.log(1111);
             if (err) {
         	    return callback(err);
             }
@@ -87,7 +88,9 @@ Files.get=function(name,filename,callback){
 
 Files.getTen =function(name,page,callback){
 	//打开数据库
+	   console.log(2222222222);
 	mongodb.open(function(err,db){
+		 console.log(44444444444);
 		if (err) {
 			return callback(err);//错误，返回错误信息
 		}
@@ -109,6 +112,7 @@ Files.getTen =function(name,page,callback){
 	    		time:-1
 	    	}).toArray(function(err,docs){
 	    		mongodb.close();
+	    		 console.log(33333333);
 	    		if (err) {
 	    			return callback(err);
 	    		}

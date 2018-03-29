@@ -1,27 +1,190 @@
-<%- include header %>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
 
-<br>
-    <img src="/head/<%=user.iid %>/head.png"  /></a></p>
-    <a href="/changehead" class="changehead" />修改头像</a>
-<br/>
-	<form action="/prechange" method="post">
-
-    	<input type="text" name="id"  readonly  unselectable="on" style="background-color:#D1D1D1;" class="<%= user._id %>" value="<%= user.iid %>">
-        <input type="text" name="name" value="<%= user.name %>" />
-        <input type="text" name="email" value="<%= user.email %>" />
-        <input type="text" name="age" value="<%= user.age %>" />
-        <input type="text" name="department"  readonly  unselectable="on" style="background-color:#D1D1D1;" value="<%= user.idepartment %>" />
-        <input type="text" name="day" readonly  unselectable="on" style="background-color:#D1D1D1;" value="<%= user.idate.day %>" />
-        <input type="text" name="place" value="<%= user.place %>" />
-        <input type="text" name="phone" value="<%= user.phone %>" />
-        <input type="text" name="role"   readonly  unselectable="on" style="background-color:#D1D1D1;" value="<%= user.irole %>" />
-         <input type="password" name="password" value="<%= user.password %>" />
-        <input type="submit" value="修改" style="margin-right: 5em;" />
-    </form>
-   
-<br>
-
-
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OA管理系统</title>
+<link rel="stylesheet" type="text/css" href="stylesheets/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="stylesheets/style.css">
+<link rel="stylesheet" type="text/css" href="stylesheets/font-awesome.min.css">
+<link rel="apple-touch-icon-precomposed" href="/icon/icon.png">
+<link rel="shortcut icon" href="/icon/favicon.ico">
+<script src="javascripts/jquery.js"></script>
 </head>
-  </body>
+
+<body class="user-select">
+<section class="container-fluid">
+  <header>
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false"> <span class="sr-only">切换导航</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
+          <a class="navbar-brand" href="/">OA系统</a> </div>
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown"> <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">账号<span class="caret"></span></a>
+              <ul class="dropdown-menu dropdown-menu-left">
+                <li><a href="/personal">个人信息</a></li>
+              </ul>
+            </li>
+            <li><a href="/logout" onClick="if(!confirm('是否确认退出？'))return false;">退出登录</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <div class="row">
+    <aside class="col-sm-3 col-md-2 col-lg-2 sidebar">
+
+      <ul class="nav nav-sidebar">
+        <li class="active"><a href="/">主页</a></li>
+      </ul>
+
+      <ul class="nav nav-sidebar">
+        <li><a href="/archive">存档</a></li>
+        <li><a href="/upload">云盘</a></li>
+        <li><a href="/department">部门公告</a></li>
+          <li><a href="/u/<%= user.iid %>">我的公告</a></li>
+        <li><a href="/imessage">消息</a></li>
+        <li><a href="/viewinnumber">部门人员查看</a></li>
+        <li><a href="/post">发表</a></li>
+         <li><a href="comment.html">评论</a></li>
+      </ul>
+
+     <% if (role==1) { %>
+      <ul class="nav nav-sidebar">
+        <li><a class="dropdown-toggle" id="otherMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">部门</a>
+          <ul class="dropdown-menu" aria-labelledby="otherMenu">
+           <li><a href="/inpeople">部门人员管理</a></li>
+            <li><a href="/inpostmanage">部门公告管理</a></li>
+          </ul>
+        </li>
+      </ul>
+      <% } %>
+
+      <% if (department=='销售部') { %>
+      <ul class="nav nav-sidebar">
+        <li><a class="dropdown-toggle" id="userMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">公司管理</a>
+          <ul class="dropdown-menu" aria-labelledby="userMenu">
+           <li><a href="/tags">标签</a></li>
+            <li><a href="/allpeople">公司人员管理</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="/viewnumber">公司人员查看</a></li>
+             <li><a href="/postmanage">公告管理</a></li>
+              <li><a href="/departmentmanage">部门管理</a></li>
+               <li><a href="/undetermined">审核人员</a></li>
+          </ul>
+         <% } %>
+
+        </li>
+        <li><a class="dropdown-toggle" id="settingMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">其他</a>
+          <ul class="dropdown-menu" aria-labelledby="settingMenu">
+            <li><a data-toggle="modal" data-target="#areDeveloping">新功能</a></li>
+            <li role="separator" class="divider"></li>
+               <li><a href="/links">友情链接</a></li>
+          </ul>
+        </li>
+      </ul>
+    </aside>
+
+
+   <div class="col-sm-9 col-sm-offset-3 col-md-10 col-lg-10 col-md-offset-2 main" id="main">
+      <form action="/prechange" method="post">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" >个人信息</h4>
+        </div>
+        <div class="modal-body">
+          <table class="table" style="margin-bottom:0px;">
+            <thead>
+              <tr> </tr>
+            </thead>
+            <tbody>
+             <tr>
+                <td wdith="20%">头像:</td>
+                <td width="80%"> 
+                <img src="/head/<%=user.iid %>/head.png"  height="48" width="48"/>
+                <a href="/changehead" class="changehead" />修改头像</a>
+                </td>
+            </tr>
+             <tr>
+                <td wdith="20%">账号:</td>
+                <td width="80%"><input type="text" value="<%= user.iid %>" readonly  unselectable="on" class="form-control" name="id" maxlength="10" unselectable="on" autocomplete="off" /></td>
+              </tr>
+              <tr>
+                <td wdith="20%">姓名:</td>
+                <td width="80%"><input type="text" value="<%= user.name %>" class="form-control" name="name" maxlength="10" autocomplete="off" /></td>
+              </tr>
+              <tr>
+                <td wdith="20%">邮箱:</td>
+                <td width="80%"><input type="text" value="<%= user.email %>" class="form-control" name="email" maxlength="10" autocomplete="off" /></td>
+              </tr>
+              <tr>
+                <td wdith="20%">电话:</td>
+                <td width="80%"><input type="text" value="<%= user.phone %>" class="form-control" name="phone" maxlength="13" autocomplete="off" /></td>
+              </tr>
+              <tr>
+                <td wdith="20%">年龄:</td>
+                <td width="80%"><input type="text" value="<%= user.age %>" class="form-control" name="age" maxlength="18" autocomplete="off" /></td>
+              </tr>
+              <tr>
+                <td wdith="20%">部门:</td>
+                <td width="80%"><input type="text" class="form-control" name="department" readonly  unselectable="on" maxlength="18" autocomplete="off" value="<%= user.idepartment %>"/></td>
+              </tr>
+              <tr>
+                <td wdith="20%">创建日期:</td>
+                <td width="80%"><input type="text" class="form-control" name="day" readonly  unselectable="on" maxlength="18" autocomplete="off" value="<%= user.idate.day %>" /></td>
+              </tr>
+              <tr>
+                <td wdith="20%">籍贯:</td>
+                <td width="80%"><input type="text" name="place" value="<%= user.place %>" class="form-control" maxlength="10" unselectable="on" autocomplete="off" /></td>
+              </tr>
+              <tr>
+                <td wdith="20%">角色:</td>
+                <td width="80%"><input type="text" value="<%= user.irole %>" class="form-control" name="role"   readonly  unselectable="on" maxlength="10" unselectable="on" autocomplete="off" /></td>
+              </tr>
+              <tr>
+                <td wdith="20%">密码:</td>
+                <td width="80%"><input type="password" name="password" value="<%= user.password %>" class="form-control"  maxlength="10" unselectable="on" autocomplete="off" /></td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr></tr>
+            </tfoot>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">提交</button>
+        </div>
+      </div>
+    </form>
+    </div>
+
+  </div>
+</section>
+
+
+
+<!--提示模态框-->
+<div class="modal fade user-select" id="areDeveloping" tabindex="-1" role="dialog" aria-labelledby="areDevelopingModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="areDevelopingModalLabel" style="cursor:default;">该功能正在日以继夜的开发中…</h4>
+      </div>
+      <div class="modal-body"> <img src="images/baoman/baoman_01.gif" alt="深思熟虑" />
+        <p style="padding:15px 15px 15px 100px; position:absolute; top:15px; cursor:default;">很抱歉，程序猿正在日以继夜的开发此功能，本程序将会在以后的版本中持续完善！</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">朕已阅</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="javascripts/bootstrap.js"></script> 
+<script src="javascripts/admin-scripts.js"></script>
+</body>
 </html>

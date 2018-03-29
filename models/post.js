@@ -69,7 +69,7 @@ Post.prototype.save = function(callback) {
 };
 
 Post.getTen =function(id,page,callback){
-	//打开数据库
+		//打开数据库
 	mongodb.open(function(err,db){
 		if (err) {
 			return callback(err);//错误，返回错误信息
@@ -81,10 +81,10 @@ Post.getTen =function(id,page,callback){
 				return callback(err);//错误，返回错误信息
 			}
 	    var query={};
-	    if (id) {
-	    	query.iid=id;
-	    }
-	     collection.count(query,function(err,total){
+	   
+	    query.iid=id;
+	  
+	    collection.count(query,function(err,total){
 	    	collection.find(query,{
 	    		skip:(page-1)*10,
 	    		limit:10
@@ -516,7 +516,6 @@ Post.searchpost =function(id,name,department,title,callback){
 				query.title=title;
 				console.log(query.title);
 			}
-		   console.log(query);
 	    	collection.find(query).sort({
 	    		time:-1
 	    	}).toArray(function(err,docs){

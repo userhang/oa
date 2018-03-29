@@ -1,9 +1,9 @@
 var mongodb=require('./db');
 
 
-function Communication(reid,seid,message){
-	this.reid=reid,
+function Communication(seid,reid,message){
 	this.seid=seid,
+	this.reid=reid,
 	this.message=message
 }
 
