@@ -9,9 +9,8 @@ function Postfiles(id,title,post,file){
 }
 
 module.exports=Postfiles;
-
+//公告文件存储
 Postfiles.prototype.save=function(callback){
-	console.log('wocao!!!!!!!!!!1');
 	var id=this.id,
 	post=this.post,
 	title=this.title,

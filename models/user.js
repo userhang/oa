@@ -103,7 +103,7 @@ User.get=function(id,callback){
 	    });
 	});
 };
-
+//所有用户信息
 User.getall =function(callback){
 	//打开数据库
 	mongodb.open(function(err,db){
@@ -132,7 +132,7 @@ User.getall =function(callback){
 };
 
 
-
+//获取10个用户信息
 User.getTen =function(page,callback){
 	//打开数据库
 	mongodb.open(function(err,db){
@@ -164,7 +164,7 @@ User.getTen =function(page,callback){
 	  	});
 };
 
-
+//获取部门所有人员
 User.getdeparpeople =function(department,page,callback){
 	//打开数据库
 	mongodb.open(function(err,db){
@@ -200,7 +200,7 @@ User.getdeparpeople =function(department,page,callback){
 };
 
 
-
+//获取审核人员
 User.getundetermined =function(page,callback){
 	//打开数据库
 	mongodb.open(function(err,db){
@@ -268,7 +268,7 @@ User.remove=function(id,callback){
 	});
 };
 
-
+//更新员工信息
 User.update=function(id,name,email,phone,age,department,day,place,role,callback){
 	mongodb.open(function(err,db){
 		if (err) {
@@ -305,7 +305,7 @@ User.update=function(id,name,email,phone,age,department,day,place,role,callback)
 	});
 };
 
-
+//更新个人信息
 User.updateone=function(id,name,email,age,place,phone,password,callback){
 	mongodb.open(function(err,db){
 		if (err) {
@@ -341,8 +341,8 @@ User.updateone=function(id,name,email,age,place,phone,password,callback){
 	});
 };
 
-
-User.changecheck=function(id,department,callback){
+//审核改变
+User.changecheck=function(id,department,role,callback){
 	mongodb.open(function(err,db){
 		if (err) {
 			return callback(err);
@@ -358,7 +358,8 @@ User.changecheck=function(id,department,callback){
 			
 		},{
 			$set:{
-			"idepartment":department
+			"idepartment":department,
+			"irole":role
 			}
 		},function(err){
 			mongodb.close();
@@ -372,7 +373,7 @@ User.changecheck=function(id,department,callback){
 	});
 };
 
-
+//搜索人员
 User.searchnumber =function(id,name,department,place,age,callback){
 	//打开数据库
 	mongodb.open(function(err,db){

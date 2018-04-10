@@ -8,7 +8,7 @@ function Messages(message){
 
 module.exports=Messages;
 
-//存储用户信息
+//存储消息信息
 Messages.prototype.save=function(callback){
 	var date=new Date();
 
@@ -34,7 +34,7 @@ Messages.prototype.save=function(callback){
 		if (err) {
 			return callback(err);//错误，返回错误信息
 		}
-		//读取users集合
+		//读取集合
 		db.collection('messages',function(err,collection){
 			if (err) {
 				mongodb.close();
@@ -54,14 +54,14 @@ Messages.prototype.save=function(callback){
 	});
 };
 
-//读取消息信息
+//查找一个消息信息
 Messages.findone=function(seid,reid,callback){
 	//打开数据库
 	mongodb.open(function(err,db){
 		if (err) {
 			return callback(err);//错误，返回错误信息
 		}
-	//读取users集合
+	//读取集合
 	    db.collection('messages',function(err,collection){
 			if (err) {
 				mongodb.close();
@@ -117,7 +117,7 @@ Messages.getTen =function(page,reid,callback){
 		if (err) {
 			return callback(err);//错误，返回错误信息
 		}
-	//读取posts集合
+	//读取集合
 	    db.collection('messages',function(err,collection){
 			if (err) {
 				mongodb.close();

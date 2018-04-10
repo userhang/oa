@@ -9,7 +9,7 @@ function Comment(id,day,title,comment){
 }
 
 module.exports=Comment;
-
+//保存评论
 Comment.prototype.save=function(callback){
 	var id=this.id,
 	day=this.day,

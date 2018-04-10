@@ -15,7 +15,7 @@ function Post(id,name,department,role,head,title,mainpost,tags,post){
 }
 
 module.exports=Post;
-
+//公告保存
 Post.prototype.save = function(callback) {
 	var date=new Date();
 
@@ -67,7 +67,7 @@ Post.prototype.save = function(callback) {
 		});
 	});
 };
-
+//获取10个公告信息
 Post.getTen =function(id,page,callback){
 		//打开数据库
 	mongodb.open(function(err,db){
@@ -185,7 +185,7 @@ Post.getmainpost =function(page,callback){
 	  	});
 };
 
-
+//获取一个公告具体信息
 Post.getOne =function(id,day,title,callback){
 	mongodb.open(function(err,db){
 		if (err) {
@@ -485,7 +485,7 @@ Post.getTag =function(tag,callback){
 
 
 
-
+//公告检索
 Post.searchpost =function(id,name,department,title,callback){
 	//打开数据库
 	mongodb.open(function(err,db){

@@ -8,7 +8,7 @@ function Communication(seid,reid,message){
 }
 
 module.exports=Communication;
-
+//保存消息
 Communication.prototype.save=function(callback){
 	var reid=this.reid,
 	seid=this.seid,

@@ -18,10 +18,9 @@ var crypto=require('crypto'),
 
 
 module.exports = function(app){
-
+//主页
     app.get('/',checkLogin);
 	app.get('/',function(req,res){
-
 	var page=req.query.p ? parseInt(req.query.p) :1;
     Post.getmainpost(page,function(err,posts,total){
 			if (err) {
@@ -41,7 +40,7 @@ module.exports = function(app){
 			});
 		});
     });
-
+//访问注册
     app.get('/reg',checkNotLogin);
     app.get('/reg',function(req,res){
 		res.render('reg',{
@@ -53,15 +52,31 @@ module.exports = function(app){
 	        error:req.flash("error").toString()
 		});
 	});
-
+//注册信息提交
 	app.post('/reg',checkNotLogin);
 	app.post('/reg',function(req,res){
 		var id=req.body.id,
 		    password=req.body.password,
 		    password_re=req.body['password-repeat'];
+		var checkreg = new RegExp("[\\u4E00-\\u9FFF]+","g");
 	    //检查两次输入密码一样否？
 	    if (password_re !=password) {
 	    	req.flash('error','两次输入密码不一致');
+	    	return res.redirect('/reg');
+	    }
+	     //检查id长度
+	    if (id.length<6) {
+	    	req.flash('error','id长度至少为6位');
+	    	return res.redirect('/reg');
+	    }
+	     //检查密码长度
+	    if (password.length<6) {
+	    	req.flash('error','密码长度至少为6位');
+	    	return res.redirect('/reg');
+	    }
+	      //检查id是否符合规则
+	    if (checkreg.test(id)) {
+	    	req.flash('error','id不能包括中文');
 	    	return res.redirect('/reg');
 	    }
 	    //生成密码的MD5值
@@ -92,7 +107,7 @@ module.exports = function(app){
 	    	});
 	    });
 	});
-
+//访问登录
     app.get('/login',checkNotLogin);
 	app.get('/login',function(req,res){
 		res.render('login',{
@@ -104,7 +119,7 @@ module.exports = function(app){
 			error:req.flash("error").toString()
 		});
 	});
-
+//提交登录信息
     app.post('/login',checkNotLogin);
 	app.post('/login',function(req,res){
 		//生成密码的MD5值
@@ -162,7 +177,7 @@ module.exports = function(app){
 	    });
 	});
 		  
-
+//登出
     app.get('/logout',checkLogin);
 	app.get('/logout',function(req,res){
 		req.session.user=null;
@@ -172,7 +187,7 @@ module.exports = function(app){
 		res.redirect('/');
 	});
 
-
+//访问云盘
 	app.get('/upload',checkLogin);
 	app.get('/upload',function(req,res){
 		var path1='./public/images/'+req.session.department;
@@ -201,7 +216,7 @@ module.exports = function(app){
 				files=[];
 			}
 			res.render('myfiles',{
-				title:'主页',
+				title:'我的文件',
 				files:files,
 				page:page,
 				isFirstPage:(page-1)==0,
@@ -215,7 +230,7 @@ module.exports = function(app){
 		});
 	});
 
-
+//上传文件
 	app.post('/upload',checkLogin);
 	app.post('/upload',function(req,res){
 		    console.log(req.files.file1.size);
@@ -232,14 +247,12 @@ module.exports = function(app){
 		        //检查用户名是否存在
 			    Files.get(req.session.user.iid,filename,function(err,file){
 			    	if (file) {
-			    		console.log('errrrrr111111111');
 			    		req.flash('error','文件名已存在');
 			    		return res.redirect('/');
 			    	}
 			    	//如果不存在则加入新用户
 			    	newFiles.save(function(err,filename){
 			    		if (err) {
-			    			console.log('errrrrr');
 			    			req.flash('error',err);
 			    			return res.redirect('/upload');
 			    		}
@@ -256,7 +269,6 @@ module.exports = function(app){
 							console.log("删除失败"+err);
 						}
 					})
-					console.log('hello');
 					req.flash('success','文件上传成功');
 		            return res.redirect('/upload');
 			    });
@@ -264,7 +276,7 @@ module.exports = function(app){
 			}
 		
 	});
-
+//上传头像
 	app.post('/uploadhead',checkLogin);
 	app.post('/uploadhead',function(req,res){
 		var imgData = req.body.imagename;
@@ -304,7 +316,7 @@ module.exports = function(app){
         });
 	});
 
-
+//访问我的文件
 	app.get('/myfiles',function(req,res){
 		var page=req.query.p ? parseInt(req.query.p) :1;
 		Files.getTen(req.session.user.iid,page,function(err,files,total){
@@ -312,7 +324,7 @@ module.exports = function(app){
 				files=[];
 			}
 			res.render('myfiles',{
-				title:'主页',
+				title:'我的文件',
 				files:files,
 				page:page,
 				isFirstPage:(page-1)==0,
@@ -326,7 +338,7 @@ module.exports = function(app){
 		});
 	});
 
-
+//删除文件
 	app.get('/deletefile/:name/:filename',checkLogin);
 	app.get('/deletefile/:name/:filename',function(req,res){
 		
@@ -345,7 +357,7 @@ module.exports = function(app){
 			return res.redirect('/upload');
 		});
 	});
-
+//下载个人文件
 	app.post('/downloadfile',function(req,res){
 		 // 实现文件下载 
 
@@ -358,7 +370,7 @@ module.exports = function(app){
 		  f.pipe(res);
 	});
 
-
+//下载公告文件
 	app.get('/downloadfile/:id/:title/:filename',function(req,res){
 		 // 实现文件下载 
 
@@ -371,7 +383,7 @@ module.exports = function(app){
 		  f.pipe(res);
 	});
 
-
+//查看所有员工
 	app.get('/allpeople',function(req,res){
         var page=req.query.p ? parseInt(req.query.p) :1;
 		Department.getchoice(function(err,des){
@@ -383,7 +395,7 @@ module.exports = function(app){
 				users=[];
 			}
 			res.render('allpeople',{
-				title:'主页',
+				title:'员工查看',
 				users:users,
 				des:des,
 				page:page,
@@ -399,7 +411,7 @@ module.exports = function(app){
 		});	
 	});
 
-
+//查看部门员工
 	app.get('/inpeople',function(req,res){
         var page=req.query.p ? parseInt(req.query.p) :1;
 		Department.getchoice(function(err,des){
@@ -411,7 +423,7 @@ module.exports = function(app){
 				users=[];
 			}
 			res.render('allpeople',{
-				title:'主页',
+				title:'员工查看',
 				users:users,
 				des:des,
 				page:page,
@@ -426,7 +438,7 @@ module.exports = function(app){
 		});	
 		});	
 	});
-
+//访问员工具体信息
 	app.get('/atpeople/:id',function(req,res){
 		Department.getchoice(function(err,des){
 			if (err) {
@@ -437,7 +449,7 @@ module.exports = function(app){
 				users=[];
 			}
 			res.render('atpeople',{
-				title:'主页',
+				title:'员工个人信息',
 				des:des,
 				user:users,
 				department:req.session.department,
@@ -449,7 +461,7 @@ module.exports = function(app){
 		});	
 	});
 
-
+//访问审核人员名单
 	app.get('/undetermined',function(req,res){
         var page=req.query.p ? parseInt(req.query.p) :1;
 		Department.getchoice(function(err,des){
@@ -461,7 +473,7 @@ module.exports = function(app){
 				users=[];
 			}
 			res.render('unpeople',{
-				title:'主页',
+				title:'审核员工',
 				users:users,
 				des:des,
 				page:page,
@@ -476,9 +488,9 @@ module.exports = function(app){
 		});	
 		});	
 	});
-
+//修改审核人员
 	app.post('/changecheck',function(req,res){
-		User.changecheck(req.body.id,req.body.department,function(err){
+		User.changecheck(req.body.id,req.body.department,req.body.role,function(err){
 			if (err) {
 				req.flash('error',err);
 				return res.redirect('back');
@@ -487,7 +499,7 @@ module.exports = function(app){
 			res.redirect('/undetermined');
 		});
 	});
-
+//访问部门管理
 	app.get('/departmentmanage',function(req,res){
 			var page=req.query.p ? parseInt(req.query.p) :1;
 		Department.getTen(page,function(err,departments,total){
@@ -495,7 +507,7 @@ module.exports = function(app){
 				departments=[];
 			}
 			res.render('departmentmanage',{
-				title:'主页',
+				title:'部门管理',
 				page:page,
 				isFirstPage:(page-1)==0,
 			    isLastPage:((page-1)*10+departments.length)==total,
@@ -508,6 +520,7 @@ module.exports = function(app){
 			});
 		});
 	});
+//修改部门管理数据
 	app.post('/departmentmanage',function(req,res){
 		var name=req.body.name;
         var newDepartment =new Department({
@@ -533,7 +546,7 @@ module.exports = function(app){
 	    });
 	});
 
-
+//删除部门
 	app.get('/deletedepartment/:id',checkLogin);
 	app.get('/deletedepartment/:id',function(req,res){
 		
@@ -547,7 +560,7 @@ module.exports = function(app){
 		});
 	});
 
-   
+   //修改部门信息
 	app.post('/changedepartment',checkLogin);
 	app.post('/changedepartment',function(req,res){
 
@@ -569,7 +582,7 @@ module.exports = function(app){
 		
 	});
 
-
+//删除员工
     app.get('/deletenumber/:id/:department',checkLogin);
 	app.get('/deletenumber/:id/:department',function(req,res){
 		var path1='./public/images/'+req.params.department+'/'+req.params.id;
@@ -603,7 +616,7 @@ module.exports = function(app){
 	
 	});
 
-	
+	//修改员工信息
 	app.post('/changenumber',function(req,res){
 		var age = parseInt(req.body.age);
 		var role= parseInt(req.body.role);
@@ -617,11 +630,11 @@ module.exports = function(app){
 		});
 	});
 
-
+//访问个人信息
 	app.get('/personal',checkLogin);
 	app.get('/personal',function(req,res){
 	    	res.render('personal',{
-				title:'主页',
+				title:'个人',
 				user:req.session.user,
 				department:req.session.department,
                 role:req.session.role,
@@ -630,11 +643,11 @@ module.exports = function(app){
 			});
 	 
 	});
-
+//访问修改头像页面
 	app.get('/changehead',checkLogin);
 	app.get('/changehead',function(req,res){
 	    	res.render('changehead',{
-				title:'主页',
+				title:'头像修改',
 				user:req.session.user,
 				department:req.session.department,
                 role:req.session.role,
@@ -644,7 +657,7 @@ module.exports = function(app){
 	 
 	});
 
-
+//修改个人信息
 	app.post('/prechange',function(req,res){	
 		var age = parseInt(req.body.age);
 		 //生成密码的MD5值
@@ -673,7 +686,7 @@ module.exports = function(app){
 		
 	});
 
-
+//访问公告发表页面
 	app.get('/post',checkLogin);
 	app.get('/post',function(req,res){
 		var path1='./public/postfiles/'+req.session.user.iid;
@@ -700,7 +713,7 @@ module.exports = function(app){
 			error:req.flash("error").toString()
 		});
 	});
-
+//公告发表
 	app.post('/post',checkLogin);
 	app.post('/post',function(req,res){
 
@@ -774,7 +787,7 @@ module.exports = function(app){
 			        });
 				});
 	});
-
+//访问具体员工公告
 	app.get('/u/:iid',function(req,res){
 		var page=req.query.p ? parseInt(req.query.p) :1;
         //检查用户是否存在
@@ -806,7 +819,7 @@ module.exports = function(app){
 		});
 	});
 
-
+//访问具体员工某条公告具体信息
 	app.get('/u/:iid/:day/:title',function(req,res){
 		Post.getOne(req.params.iid,req.params.day,req.params.title,function(err,post){
 			if (err) {
@@ -824,7 +837,7 @@ module.exports = function(app){
 		});
 		});
 	});
-
+//修改某员工某公告具体信息
 	app.post('/u/:iid/:day/:title',function(req,res){
 		var date=new Date(),
 		time=date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate()+""+date.getHours()+":"+(date.getMinutes() < 10 ? ('0' +date.getMinutes()) : date.getMinutes());
@@ -849,7 +862,7 @@ module.exports = function(app){
 	});
 
 
-
+//访问某员工某公告修改页面
 	app.get('/edit/:id/:day/:title',checkLogin);
 	app.get('/edit/:id/:day/:title',function(req,res){
 		var currentUser=req.session.user;
@@ -869,7 +882,7 @@ module.exports = function(app){
 		});
 		});
 	});
-
+//修改某员工某公告修改页面
 	app.post('/edit/:id/:day/:title',checkLogin);
 	app.post('/edit/:id/:day/:title',function(req,res){
 		var currentUser=req.session.user;
@@ -883,7 +896,7 @@ module.exports = function(app){
 			res.redirect('/');
 		});
 	});
-
+//删除公告
 	app.get('/remove/:id/:day/:title',checkLogin);
 	app.get('/remove/:id/:day/:title',function(req,res){
 		var path='./public/postfiles/'+req.params.id+'/'+req.params.title;
@@ -903,7 +916,7 @@ module.exports = function(app){
 	});
 
 
-
+//存档
     app.get('/archive',checkLogin);
 	app.get('/archive',function(req,res){
 		var page=req.query.p ? parseInt(req.query.p) :1;
@@ -926,7 +939,7 @@ module.exports = function(app){
 			});
 		});
 	});
-
+//访问标签
 	app.get('/tags',function(req,res){
     	Post.getTags(req.session.department,function(err,posts){
     		if (err) {
@@ -946,7 +959,7 @@ module.exports = function(app){
     	});
     });
 
-
+//访问某标签下具体公告
     app.get('/tags/:tag',function(req,res){
     	Post.getTag(req.params.tag,function(err,posts){
     		if (err) {
@@ -968,7 +981,7 @@ module.exports = function(app){
 
 
 
-
+//访问部门公告
 	app.get('/department',checkLogin);
 	app.get('/department',function(req,res){
 		var page=req.query.p ? parseInt(req.query.p) :1;
@@ -991,7 +1004,7 @@ module.exports = function(app){
 		});
 	});
 
-
+//访问部门公告管理
 	app.get('/inpostmanage',checkLogin);
 	app.get('/inpostmanage',function(req,res){
 		var page=req.query.p ? parseInt(req.query.p) :1;
@@ -1001,7 +1014,7 @@ module.exports = function(app){
 				return res.redirect('/');
 			}
 			res.render('postmanage',{
-				title:'存档',
+				title:'部门公告',
 				posts:posts,
 				page:page,
 				isFirstPage:(page-1)==0,
@@ -1014,7 +1027,7 @@ module.exports = function(app){
 			});
 		});
 	});
-
+//访问所有公告管理
 	app.get('/postmanage',checkLogin);
 	app.get('/postmanage',function(req,res){
 		var page=req.query.p ? parseInt(req.query.p) :1;
@@ -1024,7 +1037,7 @@ module.exports = function(app){
 				return res.redirect('/');
 			}
 			res.render('postmanage',{
-				title:'存档',
+				title:'企业公告',
 				posts:posts,
 				page:page,
 				isFirstPage:(page-1)==0,
@@ -1037,7 +1050,7 @@ module.exports = function(app){
 			});
 		});
 	});
-
+//友情链接
 	app.get('/links',function(req,res){
 		
 			res.render('links',{
@@ -1049,7 +1062,7 @@ module.exports = function(app){
 			    error:req.flash("error").toString()
 			});	
 	});
-
+//查看部门人员
 	app.get('/viewinnumber',function(req,res){
 		var page=req.query.p ? parseInt(req.query.p) :1;
 		User.getdeparpeople(req.session.department,page,function(err,users,total){
@@ -1057,7 +1070,7 @@ module.exports = function(app){
 				users=[];
 			}
 			res.render('viewpeople',{
-				title:'主页',
+				title:'部门人员',
 				users:users,
 				page:page,
 				isFirstPage:(page-1)==0,
@@ -1070,7 +1083,7 @@ module.exports = function(app){
 			});
 		});	
 	});
-
+//查看企业人员
 	app.get('/viewnumber',function(req,res){
 		var page=req.query.p ? parseInt(req.query.p) :1;
 			User.getTen(page,function(err,users,total){
@@ -1078,7 +1091,7 @@ module.exports = function(app){
 				users=[];
 			}
 			res.render('viewpeople',{
-				title:'主页',
+				title:'企业人员',
 				users:users,
 				page:page,
 				isFirstPage:(page-1)==0,
@@ -1093,15 +1106,40 @@ module.exports = function(app){
 		
 	});
 
-
+//搜索员工
 	app.post('/searchnumber',function(req,res){
-			User.searchnumber(req.body.id,req.body.name,req.session.department,req.body.place,req.body.age,function(err,users){
+		    //检查中文
+			var checkreg1 = new RegExp("[\\u4E00-\\u9FFF]+","g");
+			//检查数字
+			var checkreg2 = new RegExp("^(\\d|[1-9]\\d|100)$");  
+		   
+		    if (req.body.id) {
+		     //检查id长度
+		    if (req.body.id.length<6) {
+		    	req.flash('error','id长度至少为6位');
+		    	return res.redirect('back');
+		    }
+		     //检查id是否符合规则
+		    if (checkreg1.test(req.body.id)) {
+		    	req.flash('error','id不能包括中文');
+		        return res.redirect('back');
+		    }
+			}
+		     //检查年龄是否符合规则
+		    if (req.body.age) {
+		    if (!checkreg2.test(req.body.age)) {
+		    	req.flash('error','年龄请输入0-100整数');
+		    	return res.redirect('back');
+		    }
+		    }
+
+			User.searchnumber(req.body.id,req.body.name,req.body.department,req.body.place,req.body.age,function(err,users){
 			if (err) {
 				users=[];
 			}
 
-			res.render('viewpeople',{
-				title:'主页',
+			res.render('viewpersonal',{
+				title:'员工信息',
 				users:users,
 				user:req.session.user,
 				department:req.session.department,
@@ -1112,15 +1150,32 @@ module.exports = function(app){
 		});	
 		
 	});
-
+//搜索公告
 	app.post('/searchpost',function(req,res){
+		   //检查中文
+			var checkreg1 = new RegExp("[\\u4E00-\\u9FFF]+","g");
+			//检查数字
+			var checkreg2 = new RegExp("^(\\d|[1-9]\\d|100)$");  
+		   
+		    if (req.body.id) {
+		     //检查id长度
+		    if (req.body.id.length<6) {
+		    	req.flash('error','id长度至少为6位');
+		    	return res.redirect('back');
+		    }
+		     //检查id是否符合规则
+		    if (checkreg1.test(req.body.id)) {
+		    	req.flash('error','id不能包括中文');
+		        return res.redirect('back');
+		    }
+			}
+
 			Post.searchpost(req.body.id,req.body.name,req.session.department,req.body.title,function(err,posts){
 			if (err) {
 				users=[];
 			}
-
-			res.render('postmanage',{
-				title:'主页',
+			res.render('onepostmanage',{
+				title:'搜索公告',
 				posts:posts,
 				user:req.session.user,
 				department:req.session.department,
@@ -1141,7 +1196,7 @@ module.exports = function(app){
 				posts=[];
 			}
 			res.render('message',{
-				title:'主页',
+				title:'消息',
 				messages:messages,
 				alluser:alluser,
 				page:page,
@@ -1329,7 +1384,7 @@ module.exports = function(app){
 				return res.redirect('back');
 			    }
 			res.render('communication',{
-			title:'主页',
+			title:'联系人消息',
 			messages:messages,
 			department:req.session.department,
             role:req.session.role,
@@ -1355,7 +1410,7 @@ module.exports = function(app){
 				return res.redirect('back');
 			    }
 			res.render('comhistory',{
-			title:'主页',
+			title:'历史消息',
 			messages:messages,
 			department:req.session.department,
             role:req.session.role,

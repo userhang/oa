@@ -8,7 +8,7 @@ function Files(file){
 
 module.exports=Files;
 
-//存储用户信息
+//存储文件信息
 Files.prototype.save=function(callback){
 	var date=new Date();
 
@@ -33,7 +33,7 @@ Files.prototype.save=function(callback){
 		if (err) {
 			return callback(err);//错误，返回错误信息
 		}
-		//读取users集合
+		//读取集合
 		db.collection('files',function(err,collection){
 			if (err) {
 				mongodb.close();
@@ -61,7 +61,7 @@ Files.get=function(name,filename,callback){
 		if (err) {
 			return callback(err);//错误，返回错误信息
 		}
-	//读取users集合
+	//读取集合
 	    db.collection('files',function(err,collection){
 			if (err) {
 				mongodb.close();
@@ -85,16 +85,16 @@ Files.get=function(name,filename,callback){
 };
 
 
-
+//获取10个文件信息
 Files.getTen =function(name,page,callback){
 	//打开数据库
-	   console.log(2222222222);
+	 
 	mongodb.open(function(err,db){
-		 console.log(44444444444);
+		
 		if (err) {
 			return callback(err);//错误，返回错误信息
 		}
-	//读取posts集合
+	//读取集合
 	    db.collection('files',function(err,collection){
 			if (err) {
 				mongodb.close();
@@ -112,7 +112,7 @@ Files.getTen =function(name,page,callback){
 	    		time:-1
 	    	}).toArray(function(err,docs){
 	    		mongodb.close();
-	    		 console.log(33333333);
+	    		
 	    		if (err) {
 	    			return callback(err);
 	    		}

@@ -24,7 +24,15 @@
           <a class="navbar-brand" href="/">OA系统</a> </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav navbar-right">
-            <li class="dropdown"> <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">账号<span class="caret"></span></a>
+             <li> 
+              <% if (success) {%>
+              <a style="color: red"><%=success %></a>
+              <%} %>
+              <% if (error) {%>
+              <a style="color: red"><%=error %></a>
+              <%} %>
+            </li>
+            <li class="dropdown"> <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><%=user.iid %>|<%=user.name %><span class="caret"></span></a>
               <ul class="dropdown-menu dropdown-menu-left">
                 <li><a href="/personal">个人信息</a></li>
               </ul>
@@ -63,7 +71,7 @@
       </ul>
       <% } %>
 
-      <% if (department=='销售部') { %>
+      <% if (department=='管理层') { %>
       <ul class="nav nav-sidebar">
         <li><a class="dropdown-toggle" id="userMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">公司管理</a>
           <ul class="dropdown-menu" aria-labelledby="userMenu">
@@ -101,6 +109,7 @@
                 <th><span class="glyphicon glyphicon-user"></span> <span class="visible-lg">用户名</span></th>
                 <th><span class="glyphicon glyphicon-bookmark"></span> <span class="visible-lg">邮箱</span></th>
                  <th><span class="glyphicon glyphicon-pushpin"></span> <span class="visible-lg">部门</span></th>
+                   <th><span class="glyphicon glyphicon-flag"></span> <span class="visible-lg">角色</span></th>
                 <th><span class="glyphicon glyphicon-pencil"></span> <span class="visible-lg">操作</span></th>
               </tr>
             </thead>
@@ -114,11 +123,10 @@
                 <td><%= iuser.name %> </td>
 
     
-                <td class="hidden-sm"> <%= iuser.email %>
-                </td>
-
-                <td class="hidden-sm">
+                <td class="hidden-sm"> <%= iuser.email %></td>
                 
+               
+                <td class="hidden-sm">
                 <select name="department">
                 <option value="<%= user.idepartment %>"><%= user.idepartment %></option>
                  <% des.forEach(function(department,index){%>
@@ -126,6 +134,14 @@
                  <% }) %>
                 </select>
                 </td>
+
+                <td class="hidden-sm">
+                <select name="role">
+                <option value="2">2</option>
+                <option value="1">1</option>
+                </select>
+                </td>
+
                  <td class="hidden-sm">
                 <button class="btn btn-primary" type="submit" name="submit">修改</button>
                 </td>

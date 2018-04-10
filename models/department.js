@@ -7,7 +7,7 @@ function Department(department){
 
 module.exports=Department;
 
-//存储用户信息
+//存储部门信息
 Department.prototype.save=function(callback){
 	var date=new Date();
 
@@ -30,13 +30,13 @@ Department.prototype.save=function(callback){
 		if (err) {
 			return callback(err);//错误，返回错误信息
 		}
-		//读取users集合
+		//读取department集合
 		db.collection('departments',function(err,collection){
 			if (err) {
 				mongodb.close();
 				return callback(err);//错误，返回错误信息
 			}
-		//将用户数据插入users集合
+		//将用户数据插入department集合
 		collection.insert(department,{
 			safe:true
 		},function(err,department){
@@ -51,7 +51,7 @@ Department.prototype.save=function(callback){
 };
 
 
-//读取用户信息
+//读取department信息
 Department.get=function(name,callback){
 	//打开数据库
 	mongodb.open(function(err,db){
@@ -80,7 +80,7 @@ Department.get=function(name,callback){
 };
 
 
-
+//获得10个部门信息
 Department.getTen =function(page,callback){
 	//打开数据库
 	mongodb.open(function(err,db){
@@ -111,7 +111,7 @@ Department.getTen =function(page,callback){
 	    });
 	  	});
 };
-
+//审核选择
 Department.getchoice =function(callback){
 	//打开数据库
 	mongodb.open(function(err,db){

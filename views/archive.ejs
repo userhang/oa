@@ -24,7 +24,15 @@
           <a class="navbar-brand" href="/">OA系统</a> </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav navbar-right">
-            <li class="dropdown"> <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">账号<span class="caret"></span></a>
+             <li> 
+              <% if (success) {%>
+              <a style="color: red"><%=success %></a>
+              <%} %>
+              <% if (error) {%>
+              <a style="color: red"><%=error %></a>
+              <%} %>
+            </li>
+           <li class="dropdown"> <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><%=user.iid %>|<%=user.name %><span class="caret"></span></a>
               <ul class="dropdown-menu dropdown-menu-left">
                 <li><a href="/personal">个人信息</a></li>
               </ul>
@@ -63,7 +71,7 @@
       </ul>
       <% } %>
 
-      <% if (department=='销售部') { %>
+      <% if (department=='管理层') { %>
       <ul class="nav nav-sidebar">
         <li><a class="dropdown-toggle" id="userMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">公司管理</a>
           <ul class="dropdown-menu" aria-labelledby="userMenu">
