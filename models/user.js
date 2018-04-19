@@ -374,7 +374,7 @@ User.changecheck=function(id,department,role,callback){
 };
 
 //搜索人员
-User.searchnumber =function(id,name,department,place,age,callback){
+User.searchnumber =function(page,id,name,department,place,age,callback){
 	//打开数据库
 	mongodb.open(function(err,db){
 		if (err) {
@@ -409,15 +409,20 @@ User.searchnumber =function(id,name,department,place,age,callback){
 				console.log(query.place);
 			}
 		  
-	    	collection.find(query).sort({
+	    	collection.count(query,function(err,total){
+	    	collection.find(query,{
+	    		skip:(page-1)*10,
+	    		limit:10
+	    	}).sort({
 	    		time:-1
 	    	}).toArray(function(err,docs){
 	    		mongodb.close();
 	    		if (err) {
 	    			return callback(err);
 	    		}
-	    		callback(null,docs);
+	    		callback(null,docs,total);
 	    	});
+	    })      
 	    });     
 	    });
 	  

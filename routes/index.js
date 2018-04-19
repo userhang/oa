@@ -618,8 +618,39 @@ module.exports = function(app){
 
 	//修改员工信息
 	app.post('/changenumber',function(req,res){
-		var age = parseInt(req.body.age);
-		var role= parseInt(req.body.role);
+		    var age = parseInt(req.body.age);
+		    var role= parseInt(req.body.role);
+		   //检查中文
+			var checkreg1 = new RegExp("[\\u4E00-\\u9FFF]+","g");
+			//检查数字
+			var checkreg2 = new RegExp("^(\\d|[1-9]\\d|100)$");  
+		    var checkreg3 = new RegExp("^(\\d{1,4})(-|\/)(\\d{1,2})\\2(\\d{1,2})$");  
+		    if (req.body.phone) {
+		     //检查电话号码是否符合规则
+		    if (checkreg1.test(req.body.phone)) {
+		    	req.flash('error','电话格式不对');
+		        return res.redirect('back');
+		    }
+			}
+		     //检查年龄是否符合规则
+		    if (req.body.age) {
+		    if (!checkreg2.test(req.body.age)) {
+		    	req.flash('error','年龄请输入0-100整数');
+		    	return res.redirect('back');
+		    }
+		    }
+		    //检查角色是否符合规则
+		    if (role) {
+		    if (role==1 && role==2) {
+		    	req.flash('error','角色只能填写1或者2');
+		    	return res.redirect('back');
+		    }
+		    }
+		    //检查时间格式
+		      if(!checkreg3.test(req.body.day)){
+			  req.flash('error','时间格式错误，应该为xxxx-xx-xx模式');
+		    	return res.redirect('back');
+			  }
 		User.update(req.body.id,req.body.name,req.body.email,req.body.phone,age,req.body.department,req.body.day,req.body.place,role,function(err){
 			if (err) {
 				req.flash('error',err);
@@ -668,6 +699,27 @@ module.exports = function(app){
 			var md5=crypto.createHash('md5');
 	        password=md5.update(req.body.password).digest('hex');
 	        }
+
+	         //检查中文
+			var checkreg1 = new RegExp("[\\u4E00-\\u9FFF]+","g");
+			//检查数字
+			var checkreg2 = new RegExp("^(\\d|[1-9]\\d|100)$");  
+		   
+		    if (req.body.phone) {
+		   
+		     //检查电话号码是否符合规则
+		    if (checkreg1.test(req.body.phone)) {
+		    	req.flash('error','电话格式不对');
+		        return res.redirect('back');
+		    }
+			}
+		     //检查年龄是否符合规则
+		    if (req.body.age) {
+		    if (!checkreg2.test(req.body.age)) {
+		    	req.flash('error','年龄请输入0-100整数');
+		    	return res.redirect('back');
+		    }
+		    }
 
 	    User.updateone(req.body.id,req.body.name,req.body.email,age,req.body.place,req.body.phone,password,function(err){
 			if (err) {
@@ -1108,6 +1160,7 @@ module.exports = function(app){
 
 //搜索员工
 	app.post('/searchnumber',function(req,res){
+		   var page=req.query.p ? parseInt(req.query.p) :1;
 		    //检查中文
 			var checkreg1 = new RegExp("[\\u4E00-\\u9FFF]+","g");
 			//检查数字
@@ -1133,14 +1186,17 @@ module.exports = function(app){
 		    }
 		    }
 
-			User.searchnumber(req.body.id,req.body.name,req.body.department,req.body.place,req.body.age,function(err,users){
+			User.searchnumber(page,req.body.id,req.body.name,req.body.department,req.body.place,req.body.age,function(err,users,total){
 			if (err) {
 				users=[];
 			}
 
-			res.render('viewpersonal',{
+			res.render('viewpeople',{
 				title:'员工信息',
 				users:users,
+				page:page,
+				isFirstPage:(page-1)==0,
+			    isLastPage:((page-1)*10+users.length)==total,
 				user:req.session.user,
 				department:req.session.department,
                 role:req.session.role,
@@ -1152,6 +1208,7 @@ module.exports = function(app){
 	});
 //搜索公告
 	app.post('/searchpost',function(req,res){
+	      var page=req.query.p ? parseInt(req.query.p) :1;
 		   //检查中文
 			var checkreg1 = new RegExp("[\\u4E00-\\u9FFF]+","g");
 			//检查数字
@@ -1170,13 +1227,16 @@ module.exports = function(app){
 		    }
 			}
 
-			Post.searchpost(req.body.id,req.body.name,req.session.department,req.body.title,function(err,posts){
+			Post.searchpost(page,req.body.id,req.body.name,req.body.department,req.body.title,function(err,posts,total){
 			if (err) {
 				users=[];
 			}
-			res.render('onepostmanage',{
+			res.render('postmanage',{
 				title:'搜索公告',
 				posts:posts,
+				page:page,
+				isFirstPage:(page-1)==0,
+			    isLastPage:((page-1)*10+posts.length)==total,
 				user:req.session.user,
 				department:req.session.department,
                 role:req.session.role,

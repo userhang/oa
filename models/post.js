@@ -486,7 +486,7 @@ Post.getTag =function(tag,callback){
 
 
 //公告检索
-Post.searchpost =function(id,name,department,title,callback){
+Post.searchpost =function(page,id,name,department,title,callback){
 	//打开数据库
 	mongodb.open(function(err,db){
 		if (err) {
@@ -516,15 +516,24 @@ Post.searchpost =function(id,name,department,title,callback){
 				query.title=title;
 				console.log(query.title);
 			}
-	    	collection.find(query).sort({
+	    	collection.count(query,function(err,total){
+	    	collection.find(query,{
+	    		skip:(page-1)*10,
+	    		limit:10
+	    	}).sort({
 	    		time:-1
 	    	}).toArray(function(err,docs){
 	    		mongodb.close();
 	    		if (err) {
 	    			return callback(err);
 	    		}
-	    		callback(null,docs);
+	    		docs.forEach(function(doc){
+	    			doc.post=markdown.toHTML(doc.post);
+	    		});
+
+	    		callback(null,docs,total);
 	    	});
+	    })      
 	    });     
 	    });
 };
